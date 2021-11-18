@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cn_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.register.RegisterFragment" >
+
+    <ImageView
+        android:id="@+id/iv_background_register"
+        android:layout_width="415dp"
+        android:layout_height="556dp"
+        android:layout_marginTop="30dp"
+        android:background="#3D50B5"
+        android:backgroundTint="#3D50B5"
+        android:foregroundTint="#3D50B5"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ulpoad_picture"
+        app:srcCompat="#3351F1" />
+
+    <ImageView
+        android:id="@+id/iv_foreground_register"
+        android:layout_width="261dp"
+        android:layout_height="326dp"
+        android:layout_marginTop="103dp"
+        android:background="#3D50B5"
+        android:backgroundTint="#3D50B5"
+        android:foregroundTint="#3D50B5"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_background_register"
+        app:srcCompat="@color/white" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#088F0E"
+        android:text="Register"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_foreground_register"
+        app:layout_constraintEnd_toEndOf="@+id/iv_foreground_register"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/iv_foreground_register"
+        app:layout_constraintTop_toBottomOf="@+id/et_password_confirm" />
+
+    <EditText
+        android:id="@+id/et_username_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Username"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_foreground_register"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="@+id/iv_foreground_register"
+        app:layout_constraintTop_toTopOf="@+id/iv_foreground_register" />
+
+    <EditText
+        android:id="@+id/et_password_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_foreground_register"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="@+id/iv_foreground_register"
+        app:layout_constraintTop_toBottomOf="@+id/et_username_register" />
+
+    <EditText
+        android:id="@+id/et_password_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:hint="Confirm Password"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_foreground_register"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="@+id/iv_foreground_register"
+        app:layout_constraintTop_toBottomOf="@+id/et_password_register" />
+
+    <ImageView
+        android:id="@+id/iv_profile_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tv_ulpoad_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="Upload Picture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile_picture" />
+</androidx.constraintlayout.widget.ConstraintLayout>
