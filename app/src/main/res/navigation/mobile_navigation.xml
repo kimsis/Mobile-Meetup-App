@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_map"
-        android:name="com.example.hanger.ui.map.MapFragment"
+        android:name="com.example.hanger.ui.map.MapsFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_maps" />
 
     <fragment
         android:id="@+id/navigation_settings"
