@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Hanger">
         <activity
-            android:name=".LoginActivity"
+            android:name=".LoginRegisterActivity"
             android:exported="true"
             android:label="@string/title_activity_login">
                 <intent-filter>
