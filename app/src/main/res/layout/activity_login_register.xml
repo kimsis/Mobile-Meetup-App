@@ -4,20 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".LoginRegisterActivity"
+    android:background="#3D50B5">
 
     <ImageView
         android:id="@+id/iv_background"
         android:layout_width="415dp"
-        android:layout_height="556dp"
+        android:layout_height="200dp"
         android:background="#3D50B5"
-        android:backgroundTint="#3D50B5"
-        android:foregroundTint="#3D50B5"
+        android:backgroundTint="#FFFFFF"
+        android:foregroundTint="#FFFFFF"
         android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="#3351F1" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <ImageView
         android:id="@+id/iv_foreground"
@@ -104,5 +104,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_register_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:textColor="#FFFFFF"
+        android:text="Not yet registered?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_sign_in" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
