@@ -17,8 +17,10 @@
         android:background="@drawable/background_content_top"
         app:layout_constraintBottom_toTopOf="@id/frameLayout2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <FrameLayout
         android:id="@+id/frameLayout2"
@@ -58,13 +60,46 @@
 
     <ImageView
         android:id="@+id/imgBack"
-        android:layout_width="40"
-        android:layout_height="40"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="40dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_back"
         app:layout_constraintEnd_toStartOf="@+id/viewBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/viewBackground" />
+
+    <EditText
+        android:id="@+id/dummyOur"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="400dp"
+        android:background="@drawable/background_chat_our"
+        android:backgroundTint="#3D50B5"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="  Lorem"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/viewBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/dummyTheir"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="113dp"
+        android:layout_marginBottom="354dp"
+        android:background="@drawable/background_chat_their"
+        android:backgroundTint="#3D50B5"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="  Ipsum"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/viewBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dummyOur" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
