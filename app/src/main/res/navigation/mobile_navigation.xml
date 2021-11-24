@@ -22,4 +22,10 @@
         android:name="com.example.hanger.ui.secondarySensor.SecondarySensorFragment"
         android:label="@string/title_secondary_sensor"
         tools:layout="@layout/fragment_secondary_sensor" />
+
+    <fragment
+        android:id="@+id/navigation_requests"
+        android:name="com.example.hanger.ui.requests.RequestsFragment"
+        android:label="@string/title_requests"
+        tools:layout="@layout/fragment_requests" />
 </navigation>
