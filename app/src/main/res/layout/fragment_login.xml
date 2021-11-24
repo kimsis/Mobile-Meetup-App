@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/sw_remember_me" />
 
     <EditText
-        android:id="@+id/et_username"
+        android:id="@+id/et_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="21dp"
@@ -69,7 +69,7 @@
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="@+id/iv_foreground"
         app:layout_constraintStart_toStartOf="@+id/iv_foreground"
-        app:layout_constraintTop_toBottomOf="@+id/et_username" />
+        app:layout_constraintTop_toBottomOf="@+id/et_email" />
 
     <Switch
         android:id="@+id/sw_remember_me"
