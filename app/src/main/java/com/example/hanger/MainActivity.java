@@ -27,7 +27,6 @@ private ActivityMainBinding binding;
                 R.id.navigation_map, R.id.navigation_settings, R.id.navigation_secondary_sensor)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
