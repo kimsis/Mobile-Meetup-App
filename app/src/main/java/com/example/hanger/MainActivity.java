@@ -1,6 +1,7 @@
 package com.example.hanger;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +21,7 @@ private ActivityMainBinding binding;
         super.onCreate(savedInstanceState);
 
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
      binding = ActivityMainBinding.inflate(getLayoutInflater());
      setContentView(binding.getRoot());
 
