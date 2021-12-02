@@ -53,9 +53,8 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        mAuth = FirebaseAuth.getInstance();
         context = getActivity();
+        mAuth = FirebaseAuth.getInstance();
         Button registerButton = view.findViewById(R.id.btn_register);
         emailEditText = view.findViewById(R.id.et_email_register);
         passwordEditText = view.findViewById(R.id.et_password_register);
@@ -71,32 +70,27 @@ public class RegisterFragment extends Fragment {
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
 
-        if(!password.equals(passwordConfirm)) {
-            Toast.makeText(context, "Passwords must match", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        try {
+            FireBaseHub.CreateUser(email, password, passwordConfirm, this);
+        } catch (PasswordMismatchException e) {
+            Toast.makeText(context, "Passwords do not match.",
+                    Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "createAccount: password mismatch", e );
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(context, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-                    }
-                });
+        } catch (InvalidEmailException e) {
+            Toast.makeText(context, "Please enter a valid email.",
+                    Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "createAccount: invalid email", e);
+        }
     }
 
-    private void updateUI(FirebaseUser user) {
-
+    public void updateUI(FirebaseUser user) {
+        if (user != null) {
+            Toast.makeText(context, "Authentication successful.",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Authentication failed.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
