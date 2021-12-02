@@ -26,8 +26,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapsFragment extends Fragment implements LocationListener {
 
@@ -37,6 +44,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     private LocationListener listener = this;
     private FirebaseDatabase database;
     private FirebaseAuth auth;
+    private ArrayList<Marker> allMarkers;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -66,12 +74,24 @@ public class MapsFragment extends Fragment implements LocationListener {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        allMarkers = new ArrayList<>();
+
         this.database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
         this.auth = FirebaseAuth.getInstance();
 
-        foreach location in locations
+        DatabaseReference allLocations = database.getReference("locations/");
+        allLocations.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        setLocationPins((Map<String,HashMap<String, Double>>) dataSnapshot.getValue());
+                    }
 
-        location add event listener -> listener to change map
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        //handle databaseError
+                    }
+                });
         return view;
     }
 
@@ -99,7 +119,6 @@ public class MapsFragment extends Fragment implements LocationListener {
         if(currentMarker != null)
             currentMarker.remove();
 
-        currentMarker = map.addMarker(new MarkerOptions().position(current).title("Current location"));
         map.animateCamera(CameraUpdateFactory.newLatLng(current));
     }
 
@@ -116,5 +135,21 @@ public class MapsFragment extends Fragment implements LocationListener {
     @Override
     public void onProviderDisabled(@NonNull String provider) {
 
+    }
+
+    private void setLocationPins(Map<String, HashMap<String, Double>> userLocations){
+        for(Marker marker : allMarkers){
+            marker.remove();
+        }
+
+        for(Map.Entry<String, HashMap<String, Double>> entry : userLocations.entrySet()) {
+            Double latitude = entry.getValue().get("latitude");
+            Double longitude = entry.getValue().get("longitude");
+
+            LatLng location = new LatLng(latitude, longitude);
+
+            Marker marker = map.addMarker(new MarkerOptions().position(location));
+            allMarkers.add(marker);
+        }
     }
 }
