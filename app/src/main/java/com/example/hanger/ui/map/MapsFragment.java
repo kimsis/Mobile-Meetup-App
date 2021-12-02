@@ -79,8 +79,8 @@ public class MapsFragment extends Fragment implements LocationListener {
         this.database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
         this.auth = FirebaseAuth.getInstance();
 
-        DatabaseReference allLocations = database.getReference("locations/");
-        allLocations.addListenerForSingleValueEvent(
+        DatabaseReference allLocations = database.getReference("locations");
+        allLocations.addValueEventListener(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
