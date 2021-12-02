@@ -24,6 +24,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MapsFragment extends Fragment implements LocationListener {
 
@@ -31,6 +35,8 @@ public class MapsFragment extends Fragment implements LocationListener {
     private GoogleMap map;
     private Marker currentMarker;
     private LocationListener listener = this;
+    private FirebaseDatabase database;
+    private FirebaseAuth auth;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -60,6 +66,12 @@ public class MapsFragment extends Fragment implements LocationListener {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        this.database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
+        this.auth = FirebaseAuth.getInstance();
+
+        foreach location in locations
+
+        location add event listener -> listener to change map
         return view;
     }
 
@@ -76,6 +88,13 @@ public class MapsFragment extends Fragment implements LocationListener {
     @Override
     public void onLocationChanged(@NonNull Location location) {
         LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser != null)
+        {
+            DatabaseReference personLocationReference = database.getReference("locations/" + currentUser.getUid());
+            personLocationReference.setValue(current);
+        }
 
         if(currentMarker != null)
             currentMarker.remove();
