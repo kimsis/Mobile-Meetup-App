@@ -19,6 +19,10 @@ public class HangerUser {
         return map;
     }
 
+    public HangerUser() {
+
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -27,13 +31,12 @@ public class HangerUser {
         this.id = id;
     }
 
-    public HangerUser() {}
-
-    public HangerUser(String id, double latitude, double longitude) {
-        this.discoveryRadiusMeters = HangerUser.getRadiusMetersOptions().get(4);
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public HangerUser(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public double getLatitude() {
@@ -45,7 +48,12 @@ public class HangerUser {
     }
 
     public int getDiscoveryRadiusMeters() {
-        return discoveryRadiusMeters;
+
+        if(discoveryRadiusMeters == -1)
+            return getRadiusMetersOptions().get(4);
+        else
+            return discoveryRadiusMeters;
+
     }
 
     public void setDiscoveryRadiusMeters(int discoveryRadiusMeters) {
@@ -60,13 +68,18 @@ public class HangerUser {
         return name;
     }
 
-    public String getId() {
-        return id;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
 
     private double latitude;
     private double longitude;
-    private int discoveryRadiusMeters;
+    private int discoveryRadiusMeters = -1;
     private String name;
     private String id;
 }

@@ -90,7 +90,6 @@ public class MapsFragment extends Fragment implements LocationListener {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        //handle databaseError
                     }
                 });
         return view;
@@ -108,6 +107,9 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         for (Map.Entry<String, HangerUser> entry: userMappings.entrySet())
         {
+            if(currentUser == null)
+                continue;
+
             double distanceToCurrentUser = getDistance(currentUser.getLatitude(), entry.getValue().getLatitude(), currentUser.getLongitude(), entry.getValue().getLongitude());
 
             if(distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters())
@@ -134,21 +136,38 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         FirebaseUser currentUser = auth.getCurrentUser();
 
-        if(currentUser != null)
-        {
-            DatabaseReference personLocationReference = database.getReference("locations/" + currentUser.getUid());
+        if(currentUser == null)
+            return;
 
-            HangerUser userToCreate = new HangerUser(currentUser.getUid(), location.getLatitude(),location.getLongitude());
+        DatabaseReference personLocationReference = database.getReference("locations/" + currentUser.getUid());
 
-            personLocationReference.setValue(userToCreate);
+        personLocationReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-            if(currentCircle != null)
-                currentCircle.remove();
+                HangerUser existingUser = dataSnapshot.getValue(HangerUser.class);
 
-            this.currentCircle = map.addCircle(new CircleOptions().center(current).radius(userToCreate.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
-        }
+                if(existingUser == null)
+                    existingUser = new HangerUser(currentUser.getUid());
 
-        map.animateCamera(CameraUpdateFactory.newLatLng(current));
+                existingUser.setLatitude(location.getLatitude());
+                existingUser.setLongitude(location.getLongitude());
+
+                database.getReference("locations/" + currentUser.getUid()).setValue(existingUser);
+
+                if(currentCircle != null)
+                    currentCircle.remove();
+
+                currentCircle = map.addCircle(new CircleOptions().center(current).radius(existingUser.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
+
+                map.animateCamera(CameraUpdateFactory.newLatLng(current));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
