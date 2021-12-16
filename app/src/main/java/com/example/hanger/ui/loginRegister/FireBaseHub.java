@@ -28,7 +28,6 @@ public class FireBaseHub {
         }
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser User;
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

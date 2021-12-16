@@ -69,6 +69,7 @@ public class LoginInstrumentedTest {
         } catch (PasswordMismatchException e) {
             Log.d(TAG, "PasswordMismatchRegister: test successful", e);
         }
+
     }
 
     @Test

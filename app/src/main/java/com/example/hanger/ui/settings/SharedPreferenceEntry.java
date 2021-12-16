@@ -7,39 +7,19 @@ import java.util.Calendar;
  */
 public class SharedPreferenceEntry {
 
-    // Name of the user.
-    private final String mName;
-
-    // Date of Birth of the user.
-    private final Calendar mDateOfBirth;
-
-    // Email address of the user.
-    private final String mEmail;
-
     // Distance type selected
     private final String mDistanceType;
 
     // Distance amount
     private final String mDistanceAmount;
 
-    public SharedPreferenceEntry(String name, Calendar dateOfBirth, String email, String distanceType, String distanceAmount) {
-        mName = name;
-        mDateOfBirth = dateOfBirth;
-        mEmail = email;
+    // Theme threshold
+    private final float mThemeThreshold;
+
+    public SharedPreferenceEntry(String distanceType, String distanceAmount, float themeThreshold) {
         mDistanceType = distanceType;
         mDistanceAmount = distanceAmount;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public Calendar getDateOfBirth() {
-        return mDateOfBirth;
-    }
-
-    public String getEmail() {
-        return mEmail;
+        mThemeThreshold = themeThreshold;
     }
 
     public String getDistanceType() {
@@ -48,5 +28,9 @@ public class SharedPreferenceEntry {
 
     public String getDistanceAmount() {
         return mDistanceAmount;
+    }
+
+    public float getThemeThreshold() {
+        return mThemeThreshold;
     }
 }

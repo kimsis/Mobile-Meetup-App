@@ -22,19 +22,11 @@ import com.example.hanger.ui.settings.SharedPreferencesHelper;
 @RunWith(MockitoJUnitRunner.class)
 public class SharedPreferencesHelperTest {
 
-    private static final String TEST_NAME = "Test name";
-
-    private static final String TEST_EMAIL = "test@email.com";
-
-    private static final Calendar TEST_DATE_OF_BIRTH = Calendar.getInstance();
-
     private static final String TEST_DISTANCE_TYPE = "Km.";
 
     private static final String TEST_DISTANCE_AMOUNT = "3";
 
-    static {
-        TEST_DATE_OF_BIRTH.set(1980, 1, 1);
-    }
+    private static final float TEST_THEME_THRESHOLD = 50.5f;
 
     private SharedPreferenceEntry mSharedPreferenceEntry;
 
@@ -57,8 +49,7 @@ public class SharedPreferencesHelperTest {
     @Before
     public void initMocks() {
         // Create SharedPreferenceEntry to persist.
-        mSharedPreferenceEntry = new SharedPreferenceEntry(TEST_NAME, TEST_DATE_OF_BIRTH,
-                TEST_EMAIL, TEST_DISTANCE_TYPE, TEST_DISTANCE_AMOUNT);
+        mSharedPreferenceEntry = new SharedPreferenceEntry(TEST_DISTANCE_TYPE, TEST_DISTANCE_AMOUNT, TEST_THEME_THRESHOLD);
 
         // Create a mocked SharedPreferences.
         mMockSharedPreferencesHelper = createMockSharedPreference();
@@ -79,18 +70,17 @@ public class SharedPreferencesHelperTest {
         SharedPreferenceEntry savedSharedPreferenceEntry =
                 mMockSharedPreferencesHelper.getPersonalInfo();
 
-        // Make sure both written and retrieved personal information are equal.
         assertThat("Checking that SharedPreferenceEntry.name has been persisted and read correctly",
-                mSharedPreferenceEntry.getName(),
-                is(equalTo(savedSharedPreferenceEntry.getName())));
+                mSharedPreferenceEntry.getDistanceType(),
+                is(equalTo(savedSharedPreferenceEntry.getDistanceType())));
         assertThat("Checking that SharedPreferenceEntry.dateOfBirth has been persisted and read "
                         + "correctly",
-                mSharedPreferenceEntry.getDateOfBirth(),
-                is(equalTo(savedSharedPreferenceEntry.getDateOfBirth())));
+                mSharedPreferenceEntry.getDistanceAmount(),
+                is(equalTo(savedSharedPreferenceEntry.getDistanceAmount())));
         assertThat("Checking that SharedPreferenceEntry.email has been persisted and read "
                         + "correctly",
-                mSharedPreferenceEntry.getEmail(),
-                is(equalTo(savedSharedPreferenceEntry.getEmail())));
+                mSharedPreferenceEntry.getThemeThreshold(),
+                is(equalTo(savedSharedPreferenceEntry.getThemeThreshold())));
     }
 
     @Test
@@ -108,14 +98,10 @@ public class SharedPreferencesHelperTest {
     private SharedPreferencesHelper createMockSharedPreference() {
         // Mocking reading the SharedPreferences as if mMockSharedPreferences was previously written
         // correctly.
-        when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_NAME), anyString()))
-                .thenReturn(mSharedPreferenceEntry.getName());
-        when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_EMAIL), anyString()))
-                .thenReturn(mSharedPreferenceEntry.getEmail());
-        when(mMockSharedPreferences.getLong(eq(SharedPreferencesHelper.KEY_DOB), anyLong()))
-                .thenReturn(mSharedPreferenceEntry.getDateOfBirth().getTimeInMillis());
         when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_TYPE), anyString()))
                 .thenReturn(mSharedPreferenceEntry.getDistanceType());
+        when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_AMOUNT), anyString()))
+                .thenReturn(mSharedPreferenceEntry.getDistanceAmount());
         when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_AMOUNT), anyString()))
                 .thenReturn(mSharedPreferenceEntry.getDistanceAmount());
 
