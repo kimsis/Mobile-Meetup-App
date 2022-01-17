@@ -3,10 +3,14 @@ package com.example.hanger.ui.map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -17,7 +21,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.hanger.MainActivity;
+import com.example.hanger.Notifications;
 import com.example.hanger.R;
 import com.example.hanger.model.HangerUser;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,6 +58,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     private FirebaseAuth auth;
     private ArrayList<Marker> allMarkers;
     private  Circle currentCircle;
+    private String CHANNEL_ID = "someId";
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -114,9 +122,44 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             if(distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters())
                 filtered.add(entry.getValue());
+                showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName());
         }
-
         return filtered;
+    }
+
+
+    private void showMatchRequestNotification(String id, String name) {
+        Intent intent = new Intent(this.getContext(),MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getContext(), 0, intent, 0);
+
+        Intent intentActionAccept = new Intent(this.getContext(), Notifications.class);
+        Intent intentActionDecline = new Intent(this.getContext(), Notifications.class);
+
+        intentActionAccept.putExtra("action", "accept");
+        intentActionAccept.putExtra("userId",id);
+
+        intentActionDecline.putExtra("action", "decline");
+        intentActionDecline.putExtra("userId",id);
+
+        PendingIntent acceptRequest = PendingIntent.getBroadcast(this.getContext(), 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent declineRequest = PendingIntent.getBroadcast(this.getContext(), 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle(name + " is in your area :O")
+                .setContentText("Wanna see me on the map?")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(R.drawable.common_google_signin_btn_icon_light_normal, "Accept",
+                acceptRequest)
+                .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",
+                        declineRequest);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
+        notificationManager.notify(1, builder.build());
 
     }
 
@@ -128,7 +171,10 @@ public class MapsFragment extends Fragment implements LocationListener {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
     }
+
+
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
@@ -197,11 +243,27 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             LatLng location = new LatLng(latitude, longitude);
 
-            Marker marker = map.addMarker(new MarkerOptions().position(location));
+            if(entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
+            {
+                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
+                toast.show();
+//                for (HangerUser user:users) {
+//                    if(user.getId()==(auth.getUid()))
+//                    {
+//                        if(user.getUsersMatched().get(entry.getId()) == "true")
+//                        {
+                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
+                            toast1.show();
+                            Marker marker = map.addMarker(new MarkerOptions().position(location));
 
-            marker.setTitle(entry.getName());
+                            marker.setTitle(entry.getName());
 
-            allMarkers.add(marker);
+                            allMarkers.add(marker);
+//                        }
+//                    }
+//                }
+            }
+
         }
     }
 
