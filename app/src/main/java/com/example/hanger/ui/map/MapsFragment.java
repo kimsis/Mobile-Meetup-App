@@ -247,11 +247,11 @@ public class MapsFragment extends Fragment implements LocationListener {
             {
                 Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
                 toast.show();
-//                for (HangerUser user:users) {
-//                    if(user.getId()==(auth.getUid()))
-//                    {
-//                        if(user.getUsersMatched().get(entry.getId()) == "true")
-//                        {
+                for (HangerUser user:users) {
+                    if(user.getId().equals(auth.getCurrentUser().getUid()))
+                    {
+                        if(user.getUsersMatched().get(entry.getId()) == "true")
+                        {
                             Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
                             toast1.show();
                             Marker marker = map.addMarker(new MarkerOptions().position(location));
@@ -259,9 +259,9 @@ public class MapsFragment extends Fragment implements LocationListener {
                             marker.setTitle(entry.getName());
 
                             allMarkers.add(marker);
-//                        }
-//                    }
-//                }
+                        }
+                    }
+                }
             }
 
         }
