@@ -6,7 +6,12 @@ import android.preference.PreferenceManager;
 
 import com.example.hanger.ui.settings.SharedPreferencesHelper;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HangerUser {
 
@@ -25,6 +30,10 @@ public class HangerUser {
         return map;
     }
 
+    public HangerUser() {
+
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -33,13 +42,12 @@ public class HangerUser {
         this.id = id;
     }
 
-    public HangerUser() {}
-
-    public HangerUser(String id, double latitude, double longitude) {
-        this.discoveryRadiusMeters = HangerUser.getRadiusMetersOptions().get(4);
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public HangerUser(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public double getLatitude() {
@@ -51,7 +59,12 @@ public class HangerUser {
     }
 
     public int getDiscoveryRadiusMeters() {
-        return discoveryRadiusMeters;
+
+        if(discoveryRadiusMeters == -1)
+            return getRadiusMetersOptions().get(4);
+        else
+            return discoveryRadiusMeters;
+
     }
 
     public int getDiscoveryRadius() {
@@ -70,14 +83,51 @@ public class HangerUser {
         return name;
     }
 
-    public String getId() {
-        return id;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setUsersMatched(Object map)
+    {
+        usersMatched = map;
+    }
+
+    public Map<String, String> getUsersMatched()
+    {
+        Map<String, String> hm = new HashMap<String,String>();
+        String[] keys = usersMatched.toString()
+                .replace("{","")
+                .replace("}","")
+                .replace("=","")
+                .replace("false","")
+                .replace("true","").trim().split(",");
+        String[] values = usersMatched.toString()
+                .split(",");
+
+        for (int i = 0; i < keys.length; i++)
+        {
+            if(values[i].contains("false"))
+            {
+                values[i] = "false";
+            }
+            else {
+                values[i] = "true";
+            }
+            hm.put(keys[i].trim(),values[i]);
+        }
+        return hm;
+    }
+
 
     private double latitude;
     private double longitude;
-    private int discoveryRadiusMeters;
+    private int discoveryRadiusMeters = -1;
     private String name;
     private String id;
+    private Object usersMatched;
 }
 
