@@ -8,15 +8,15 @@ import java.util.Calendar;
 public class SharedPreferenceEntry {
 
     // Distance type selected
-    private final String mDistanceType;
+    private String mDistanceType;
 
     // Distance amount
-    private final String mDistanceAmount;
+    private float mDistanceAmount;
 
     // Theme threshold
-    private final float mThemeThreshold;
+    private float mThemeThreshold;
 
-    public SharedPreferenceEntry(String distanceType, String distanceAmount, float themeThreshold) {
+    public SharedPreferenceEntry(String distanceType, float distanceAmount, float themeThreshold) {
         mDistanceType = distanceType;
         mDistanceAmount = distanceAmount;
         mThemeThreshold = themeThreshold;
@@ -26,11 +26,23 @@ public class SharedPreferenceEntry {
         return mDistanceType;
     }
 
-    public String getDistanceAmount() {
+    public float getDistanceAmount() {
         return mDistanceAmount;
     }
 
     public float getThemeThreshold() {
         return mThemeThreshold;
+    }
+
+    public void setDistanceType(String mDistanceType) {
+        this.mDistanceType = mDistanceType;
+    }
+
+    public void setDistanceAmount(float mDistanceAmount) {
+        this.mDistanceAmount = mDistanceAmount;
+    }
+
+    public void setThemeThreshold(float mThemeThreshold) {
+        this.mThemeThreshold = mThemeThreshold;
     }
 }

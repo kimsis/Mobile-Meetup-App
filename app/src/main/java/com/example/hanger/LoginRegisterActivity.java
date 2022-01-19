@@ -14,13 +14,10 @@ import android.os.Bundle;
 
 import com.example.hanger.ui.loginRegister.LoginFragment;
 import com.example.hanger.ui.loginRegister.RegisterFragment;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class LoginRegisterActivity extends AppCompatActivity {
 

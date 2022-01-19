@@ -24,7 +24,7 @@ public class SharedPreferencesHelperTest {
 
     private static final String TEST_DISTANCE_TYPE = "Km.";
 
-    private static final String TEST_DISTANCE_AMOUNT = "3";
+    private static final float TEST_DISTANCE_AMOUNT = 3.0f;
 
     private static final float TEST_THEME_THRESHOLD = 50.5f;
 
@@ -100,10 +100,10 @@ public class SharedPreferencesHelperTest {
         // correctly.
         when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_TYPE), anyString()))
                 .thenReturn(mSharedPreferenceEntry.getDistanceType());
-        when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_AMOUNT), anyString()))
+        when(mMockSharedPreferences.getFloat(eq(SharedPreferencesHelper.KEY_DISTANCE_AMOUNT), anyFloat()))
                 .thenReturn(mSharedPreferenceEntry.getDistanceAmount());
-        when(mMockSharedPreferences.getString(eq(SharedPreferencesHelper.KEY_DISTANCE_AMOUNT), anyString()))
-                .thenReturn(mSharedPreferenceEntry.getDistanceAmount());
+        when(mMockSharedPreferences.getFloat(eq(SharedPreferencesHelper.KEY_THEME_THRESHOLD), anyFloat()))
+                .thenReturn(mSharedPreferenceEntry.getThemeThreshold());
 
         // Mocking a successful commit.
         when(mMockEditor.commit()).thenReturn(true);

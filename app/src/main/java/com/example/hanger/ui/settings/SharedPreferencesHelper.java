@@ -33,11 +33,23 @@ public class SharedPreferencesHelper {
         // Start a SharedPreferences transaction.
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(KEY_DISTANCE_TYPE, sharedPreferenceEntry.getDistanceType());
-        editor.putString(KEY_DISTANCE_AMOUNT, sharedPreferenceEntry.getDistanceAmount());
-        editor.putString(KEY_THEME_THRESHOLD, sharedPreferenceEntry.getDistanceAmount());
+        editor.putFloat(KEY_DISTANCE_AMOUNT, sharedPreferenceEntry.getDistanceAmount());
+        editor.putFloat(KEY_THEME_THRESHOLD, sharedPreferenceEntry.getThemeThreshold());
 
         // Commit changes to SharedPreferences.
         return editor.commit();
+    }
+
+    public boolean saveDistanceType(String distanceType) {
+        return mSharedPreferences.edit().putString(KEY_DISTANCE_TYPE, distanceType).commit();
+    }
+
+    public boolean saveDistanceAmount(float distanceAmount) {
+        return mSharedPreferences.edit().putFloat(KEY_DISTANCE_AMOUNT, distanceAmount).commit();
+    }
+
+    public boolean saveThemeThreshold(float themeThreshold) {
+        return mSharedPreferences.edit().putFloat(KEY_THEME_THRESHOLD, themeThreshold).commit();
     }
 
     /**
@@ -49,7 +61,7 @@ public class SharedPreferencesHelper {
     public SharedPreferenceEntry getPersonalInfo() {
         // Get data from the SharedPreferences.
         String distanceType = mSharedPreferences.getString(KEY_DISTANCE_TYPE, "");
-        String distanceAmount = mSharedPreferences.getString(KEY_DISTANCE_AMOUNT, "");
+        float distanceAmount = mSharedPreferences.getFloat(KEY_DISTANCE_AMOUNT, 0.0f);
         float themeThreshold = mSharedPreferences.getFloat(KEY_THEME_THRESHOLD, 0.0f);
 
         // Create and fill a SharedPreferenceEntry model object.

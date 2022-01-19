@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginTop="16dp"
-                android:text="Account Settings"
+                android:text="Theme Threshold"
                 android:textSize="16sp" />
 
             <androidx.cardview.widget.CardView
@@ -61,11 +61,46 @@
                 android:layout_margin="8dp"
                 card_view:cardCornerRadius="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:text="Insert Settings here" />
+               <androidx.constraintlayout.widget.ConstraintLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <EditText
+                       android:id="@+id/number_sensor_sensitivity"
+                       android:layout_width="0dp"
+                       android:layout_height="48dp"
+                       android:layout_marginStart="8dp"
+                       android:layout_marginTop="16dp"
+                       android:ems="10"
+                       android:hint="Light threshehold"
+                       android:inputType="numberDecimal"
+                       android:text="1"
+                       app:layout_constraintStart_toStartOf="parent"
+                       app:layout_constraintTop_toTopOf="parent" />
+
+                   <Button
+                       android:id="@+id/button_set_threshehold"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_marginStart="8dp"
+                       android:layout_marginTop="8dp"
+                       android:layout_marginEnd="8dp"
+                       android:text="Set Threshehold"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       app:layout_constraintStart_toEndOf="@+id/number_sensor_sensitivity"
+                       app:layout_constraintTop_toTopOf="parent" />
+
+                   <TextView
+                       android:id="@+id/text_theme_state"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       app:layout_constraintStart_toStartOf="parent"
+                       android:textColor="#FF0000"
+                       app:layout_constraintTop_toBottomOf="@+id/button_set_threshehold" />
+
+               </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -97,6 +132,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/distanceTV"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Xkm"
@@ -105,9 +141,12 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.slider.Slider
-                        android:id="@+id/slider"
+                        android:id="@+id/distanceSlider"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:valueFrom="0"
+                        android:valueTo="100"
+                        android:stepSize="1"
                         app:layout_constraintTop_toBottomOf="@id/tv_max_distance" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -125,7 +164,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/tv_distance_type"
+                        android:id="@+id/distance_type_label_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
@@ -136,6 +175,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/distance_type_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="M."
@@ -143,45 +183,50 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <LinearLayout
-                        style="?android:attr/buttonBarStyle"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/activity_main_togglebutton"
+                        app:layout_constraintTop_toBottomOf="@+id/distance_type_label_tv"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="12dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:gravity="fill"
-                        android:orientation="horizontal"
-                        app:layout_constraintTop_toBottomOf="@id/tv_distance_type">
+                        app:singleSelection="true"
+                        app:checkedButton="@id/btn_km">
 
-                        <Button
-                            style="?android:attr/buttonBarButtonStyle"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_m"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="M." />
+                            android:layout_height="wrap_content"
+                            android:text="M."
+                            style="?attr/materialButtonOutlinedStyle" />
 
-                        <Button
-                            style="?android:attr/buttonBarButtonStyle"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_km"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Km." />
+                            android:layout_height="wrap_content"
+                            android:text="Km."
+                            style="?attr/materialButtonOutlinedStyle" />
 
-                        <Button
-                            style="?android:attr/buttonBarButtonStyle"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_ft"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Ft." />
+                            android:layout_height="wrap_content"
+                            android:text="Ft."
+                            style="?attr/materialButtonOutlinedStyle" />
 
-                        <Button
-                            style="?android:attr/buttonBarButtonStyle"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_mi"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Mi." />
+                            android:layout_height="wrap_content"
+                            android:text="Mi."
+                            style="?attr/materialButtonOutlinedStyle" />
 
-                    </LinearLayout>
-
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
