@@ -1,5 +1,7 @@
 package com.example.hanger.ui.loginRegister;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,10 +23,13 @@ import android.widget.Toast;
 import com.example.hanger.LoginRegisterActivity;
 import com.example.hanger.MainActivity;
 import com.example.hanger.R;
+import com.example.hanger.model.HangerUser;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginFragment extends Fragment {
 
@@ -126,6 +131,16 @@ public class LoginFragment extends Fragment {
 
     private void handleSignInResult(Task<AuthResult> task) {
         if (task.isSuccessful()) {
+
+            DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference("locations/" + auth.getUid() );
+            Log.d(TAG, "createAccount: " + ref);
+            HangerUser currentUser = new HangerUser(auth.getUid());
+            currentUser.setLatitude(0);
+            currentUser.setLongitude(0);
+            currentUser.setDiscoveryRadiusMeters(300);
+            ref.setValue(currentUser);
+            Log.d(TAG, "createAccount: " + ref + "       " + currentUser);
+
             navigateToMainActivity();
         } else {
             Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show();

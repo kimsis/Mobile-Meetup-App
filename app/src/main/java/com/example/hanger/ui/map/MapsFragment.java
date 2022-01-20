@@ -59,7 +59,7 @@ import java.util.Map;
 
 public class MapsFragment extends Fragment implements LocationListener {
 
-    private GoogleMap map;
+    private static GoogleMap map;
     private final LocationListener listener = this;
     private FirebaseDatabase database;
     private FirebaseAuth auth;
@@ -116,6 +116,25 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         DatabaseReference myLocation = database.getReference("locations/" + auth.getUid());
 
+        myLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                HangerUser existingUser = dataSnapshot.getValue(HangerUser.class);
+
+                if(existingUser == null)
+                    existingUser = new HangerUser(auth.getCurrentUser().getUid());
+
+                existingUser.setLatitude(existingUser.getLatitude() + 0.000000000000001);
+
+                database.getReference("locations/" + auth.getCurrentUser().getUid()).setValue(existingUser);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         allLocations.addValueEventListener(
                 new ValueEventListener() {
                     @Override
@@ -154,7 +173,6 @@ public class MapsFragment extends Fragment implements LocationListener {
             {
                 DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/usersNotified");
 
-                Log.d(TAG, "FilterRelevantUsers: " + currentUser.getUsersMatched());
                 String matchedUser = currentUser.getUsersMatched().get(entry.getValue().getId());
                 if(matchedUser != null && matchedUser.equals("false") && !currentUser.getUsersNotified().contains(entry.getValue().getId()))
                 {
@@ -281,6 +299,9 @@ public class MapsFragment extends Fragment implements LocationListener {
                 double latitude = user.getLatitude();
                 double longitude = user.getLongitude();
                 LatLng location = new LatLng(latitude, longitude);
+                if(map == null) {
+
+                }
                 Marker marker = map.addMarker(new MarkerOptions().position(location));
                 marker.setTitle(user.getName());
                 allMarkers.add(marker);

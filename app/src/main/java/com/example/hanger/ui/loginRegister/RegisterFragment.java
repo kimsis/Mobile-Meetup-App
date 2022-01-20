@@ -29,9 +29,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hanger.R;
+import com.example.hanger.model.HangerUser;
 import com.example.hanger.ui.helpers.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 
@@ -105,6 +108,7 @@ public class RegisterFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
             Log.e(TAG, "createAccount: invalid email", e);
         }
+
     }
 
     public void updateUI(FirebaseUser user) {
