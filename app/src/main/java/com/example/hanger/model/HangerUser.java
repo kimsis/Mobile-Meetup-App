@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.example.hanger.ui.settings.SharedPreferencesHelper;
+import com.google.firebase.database.DatabaseReference;
 
 import org.json.JSONObject;
 
@@ -31,7 +32,7 @@ public class HangerUser {
     }
 
     public HangerUser() {
-
+        usersNotified = new ArrayList<>();
     }
 
     public void setName(String name) {
@@ -132,5 +133,18 @@ public class HangerUser {
     private String name;
     private String id;
     private Object usersMatched;
+    private List<String> usersNotified;
+
+    public List<String> getUsersNotified() {
+        return usersNotified;
+    }
+
+    public void setUsersNotified(List<String> usersNotified) {
+        this.usersNotified = usersNotified;
+    }
+
+    public void addToUserNotified(String user){
+        usersNotified.add(user);
+    }
 }
 

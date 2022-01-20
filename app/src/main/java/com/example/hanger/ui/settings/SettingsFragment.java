@@ -181,7 +181,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d(TAG, "onSensorChanged: Sensor value:" + sensorEvent.values[0] + " Sensor sensitivity: " + sensorSensitivity);
+        //Log.d(TAG, "onSensorChanged: Sensor value:" + sensorEvent.values[0] + " Sensor sensitivity: " + sensorSensitivity);
         if(sensorEvent.values[0] < sensorSensitivity) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {

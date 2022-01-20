@@ -30,19 +30,18 @@ public class Notifications extends BroadcastReceiver {
         db = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
         this.auth = FirebaseAuth.getInstance();
         if(action.equals("accept")){
-
             DatabaseReference allLocations = db.getReference("locations");
             allLocations.child(auth.getCurrentUser().getUid())
                     .child("usersMatched")
                     .child(userId)
-                    .setValue(true);
+                    .setValue("true");
         }
         if (action.equals("decline")) {
             DatabaseReference allLocations = db.getReference("locations");
             allLocations.child(auth.getCurrentUser().getUid())
                     .child("usersMatched")
                     .child(userId)
-                    .setValue(false);
+                    .setValue("false");
         }
         if (context != null) {
             NotificationManagerCompat.from(context).cancel(1);

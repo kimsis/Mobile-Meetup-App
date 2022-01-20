@@ -114,13 +114,13 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         DatabaseReference allLocations = database.getReference("locations");
 
+        DatabaseReference myLocation = database.getReference("locations/" + auth.getUid());
+
         allLocations.addValueEventListener(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-
                         List<HangerUser> filteredUsers = FilterRelevantUsers(dataSnapshot);
-
                         setLocationPins(filteredUsers);
                     }
 
@@ -150,13 +150,24 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             if(distanceToCurrentUser < distance)
                 filtered.add(entry.getValue());
-                showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName());
+            if(!entry.getValue().getId().equals(auth.getCurrentUser().getUid()))
+            {
+                DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/usersNotified");
+
+                if(currentUser.getUsersMatched().get(entry.getValue().getId()).equals("false") && !currentUser.getUsersNotified().contains(entry.getValue().getId()))
+                {
+                    showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName(), entry.hashCode());
+                    currentUser.addToUserNotified(entry.getValue().getId());
+
+                    ref.setValue(currentUser.getUsersNotified());
+                }
+            }
         }
         return filtered;
     }
 
 
-    private void showMatchRequestNotification(String id, String name) {
+    private void showMatchRequestNotification(String id, String name, int channelId) {
         Intent intent = new Intent(this.getContext(),MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -187,7 +198,7 @@ public class MapsFragment extends Fragment implements LocationListener {
                         declineRequest);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
-        notificationManager.notify(1, builder.build());
+        notificationManager.notify(channelId, builder.build());
     }
 
     @Override
@@ -262,7 +273,7 @@ public class MapsFragment extends Fragment implements LocationListener {
         for(Marker marker : allMarkers){
             marker.remove();
         }
-
+        //Displays personal marker
         for (HangerUser user:users) {
             if(user.getId().equals(auth.getCurrentUser().getUid()))
             {
