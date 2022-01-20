@@ -114,6 +114,14 @@ public class LoginFragment extends Fragment {
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();
 
+        if(!EmailValidator.isValidEmail(email)) {
+            Toast.makeText(context, "Invalid email!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(password.isEmpty() || password.length() < 6) {
+            Toast.makeText(context, "Password must be at least 6 symbols!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener( context, this::handleSignInResult);
 

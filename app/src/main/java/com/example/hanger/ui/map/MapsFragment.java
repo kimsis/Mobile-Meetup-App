@@ -282,16 +282,15 @@ public class MapsFragment extends Fragment implements LocationListener {
                         {
                             Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
                             toast1.show();
+                            Marker marker = map.addMarker(new MarkerOptions().position(location));
 
+                            marker.setTitle(entry.getName());
+
+                            allMarkers.add(marker);
                         }
                     }
                 }
             }
-            Marker marker = map.addMarker(new MarkerOptions().position(location));
-
-            marker.setTitle(entry.getName());
-
-            allMarkers.add(marker);
 
         }
     }
