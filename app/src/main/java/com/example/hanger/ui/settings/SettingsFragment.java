@@ -30,8 +30,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hanger.R;
 import com.example.hanger.databinding.FragmentSettingsBinding;
 import com.example.hanger.ui.helpers.ImageHelper;
+import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.Slider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 
@@ -112,6 +118,14 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         });
         userProfileImage = binding.ivUserProfile;
         imageHelper.getImage(userProfileImage);
+        binding.btnSaveName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/name");
+                ref.setValue(binding.etUserName.getText().toString());
+                Log.d(TAG, "onClick: " + ref);
+            }
+        });
         binding.sliderDistance.setValue(sharedPreferenceEntry.getDistanceAmount());
         binding.sliderDistance.addOnChangeListener(new Slider.OnChangeListener() {
             @Override

@@ -35,13 +35,32 @@
                         android:contentDescription="profile image"
                         tools:src="@drawable/app_icon" />
 
-                    <TextView
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="User Name"
-                        android:textAlignment="center"
-                        android:textSize="32sp" />
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/et_user_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="User Name"
+                            android:textAlignment="center"
+                            android:textSize="32sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/btn_save_name"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/save"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
@@ -61,40 +80,40 @@
                 android:layout_margin="8dp"
                 card_view:cardCornerRadius="4dp">
 
-               <androidx.constraintlayout.widget.ConstraintLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
 
-                   <TextView
-                       android:id="@+id/tv_sensor_sensitivity"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_margin="8dp"
-                       android:text="Light Sensor Sensitivity"
-                       app:layout_constraintStart_toStartOf="parent"
-                       app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/tv_sensor_sensitivity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="Light Sensor Sensitivity"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                   <TextView
-                       android:id="@+id/tv_number_sensor_sensitivity"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_margin="8dp"
-                       android:text="X"
-                       android:textSize="16sp"
-                       app:layout_constraintEnd_toEndOf="parent"
-                       app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/tv_number_sensor_sensitivity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="X"
+                        android:textSize="16sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                   <com.google.android.material.slider.Slider
-                       android:id="@+id/slider_sensor_sensitivity"
-                       android:layout_width="match_parent"
-                       android:layout_height="match_parent"
-                       android:valueFrom="0"
-                       android:valueTo="10"
-                       android:stepSize="0.1"
-                       app:layout_constraintTop_toBottomOf="@id/tv_sensor_sensitivity" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_sensor_sensitivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:stepSize="0.1"
+                        android:valueFrom="0"
+                        android:valueTo="10"
+                        app:layout_constraintTop_toBottomOf="@id/tv_sensor_sensitivity" />
 
-               </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -139,9 +158,9 @@
                         android:id="@+id/slider_distance"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:stepSize="1"
                         android:valueFrom="0"
                         android:valueTo="100"
-                        android:stepSize="1"
                         app:layout_constraintTop_toBottomOf="@id/tv_max_distance" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -181,46 +200,46 @@
 
                     <com.google.android.material.button.MaterialButtonToggleGroup
                         android:id="@+id/btn_group_distance_type"
-                        app:layout_constraintTop_toBottomOf="@+id/distance_type_label_tv"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginTop="12dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:singleSelection="true"
-                        app:checkedButton="@id/btn_km">
+                        android:layout_marginTop="12dp"
+                        app:checkedButton="@id/btn_km"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/distance_type_label_tv"
+                        app:singleSelection="true">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_m"
+                            style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="wrap_content"
-                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="M."
-                            style="?attr/materialButtonOutlinedStyle" />
+                            android:layout_weight="1"
+                            android:text="M." />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_km"
+                            style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="wrap_content"
-                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="Km."
-                            style="?attr/materialButtonOutlinedStyle" />
+                            android:layout_weight="1"
+                            android:text="Km." />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_ft"
+                            style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="wrap_content"
-                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="Ft."
-                            style="?attr/materialButtonOutlinedStyle" />
+                            android:layout_weight="1"
+                            android:text="Ft." />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_mi"
+                            style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="wrap_content"
-                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="Mi."
-                            style="?attr/materialButtonOutlinedStyle" />
+                            android:layout_weight="1"
+                            android:text="Mi." />
 
                     </com.google.android.material.button.MaterialButtonToggleGroup>
 
