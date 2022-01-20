@@ -174,11 +174,9 @@ public class MapsFragment extends Fragment implements LocationListener {
                 DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/usersNotified");
 
                 String matchedUser = currentUser.getUsersMatched().get(entry.getValue().getId());
-                if(matchedUser != null && matchedUser.equals("false") && !currentUser.getUsersNotified().contains(entry.getValue().getId()))
-                {
+                if(matchedUser == null && !currentUser.getUsersNotified().contains(entry.getValue().getId())){
                     showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName(), entry.hashCode());
                     currentUser.addToUserNotified(entry.getValue().getId());
-
                     ref.setValue(currentUser.getUsersNotified());
                 }
             }
