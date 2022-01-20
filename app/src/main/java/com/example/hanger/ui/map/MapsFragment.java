@@ -120,7 +120,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
                         List<HangerUser> filteredUsers = FilterRelevantUsers(dataSnapshot);
 
-                        //setLocationPins(filteredUsers);
+                        setLocationPins(filteredUsers);
                     }
 
                     @Override
@@ -271,27 +271,27 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             LatLng location = new LatLng(latitude, longitude);
 
-            entry.setUsersMatched(userMappings);
-//            if(entry.getUsersMatched() != null && entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
-//            {
-//                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
-//                toast.show();
-//                for (HangerUser user:users) {
-//                    if(user.getId().equals(auth.getCurrentUser().getUid()))
-//                    {
-//                        if(user.getUsersMatched().get(entry.getId()) == "true")
-//                        {
-//                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
-//                            toast1.show();
-//                            Marker marker = map.addMarker(new MarkerOptions().position(location));
-//
-//                            marker.setTitle(entry.getName());
-//
-//                            allMarkers.add(marker);
-//                        }
-//                    }
-//                }
-//            }
+            if(entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
+            {
+                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
+                toast.show();
+                for (HangerUser user:users) {
+                    if(user.getId().equals(auth.getCurrentUser().getUid()))
+                    {
+                        if(user.getUsersMatched().get(entry.getId()) == "true")
+                        {
+                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
+                            toast1.show();
+
+                        }
+                    }
+                }
+            }
+            Marker marker = map.addMarker(new MarkerOptions().position(location));
+
+            marker.setTitle(entry.getName());
+
+            allMarkers.add(marker);
 
         }
     }

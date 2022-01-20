@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import android.content.SharedPreferences;
 import java.util.Calendar;
@@ -20,7 +20,7 @@ import com.example.hanger.ui.settings.SharedPreferencesHelper;
  * Unit tests for the {@link SharedPreferencesHelper} that mocks {@link SharedPreferences}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SharedPreferencesHelperTest {
+public class SharedPreferencesHelperInstrumentedTest {
 
     private static final String TEST_DISTANCE_TYPE = "Km.";
 
