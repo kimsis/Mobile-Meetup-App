@@ -12,16 +12,20 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.example.hanger.ui.helpers.ViewPagerFragmentAdapter;
 import com.example.hanger.ui.loginRegister.LoginFragment;
 import com.example.hanger.ui.loginRegister.RegisterFragment;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class LoginRegisterActivity extends AppCompatActivity {
 
     private final ArrayList<Fragment> fragments = new ArrayList<>();
+    private ViewPager2 viewPager2;
+    private Method functionToPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,35 +36,17 @@ public class LoginRegisterActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login_register);
 
-        fragments.add(new LoginFragment());
-        fragments.add(new RegisterFragment());
 
         //Finding the viewPager in the XML file
-        ViewPager2 viewPager = findViewById(R.id.ViewPager);
+        this.viewPager2 = findViewById(R.id.ViewPager);
+
+        fragments.add(new LoginFragment(this.viewPager2));
+        fragments.add(new RegisterFragment(this.viewPager2));
 
         //Creating the Adapter object, to be used for the fragments
-        ViewPagerFragmentAdapter viewPagerFragmentAdapter = new ViewPagerFragmentAdapter(this);
+        ViewPagerFragmentAdapter viewPagerFragmentAdapter = new ViewPagerFragmentAdapter(this, fragments);
 
         //Setting the adapter on the ViewPager, so that it can properly display the Fragments
-        viewPager.setAdapter(viewPagerFragmentAdapter);
-    }
-
-    public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
-
-        public ViewPagerFragmentAdapter(@NonNull FragmentActivity fragmentActivity) {
-            super(fragmentActivity);
-        }
-
-        @NonNull
-        @NotNull
-        @Override
-        public Fragment createFragment(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return fragments.size();
-        }
+        this.viewPager2.setAdapter(viewPagerFragmentAdapter);
     }
 }

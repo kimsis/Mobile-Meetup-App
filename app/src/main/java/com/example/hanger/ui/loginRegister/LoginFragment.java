@@ -8,7 +8,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hanger.LoginRegisterActivity;
 import com.example.hanger.MainActivity;
 import com.example.hanger.R;
 import com.google.android.gms.tasks.Task;
@@ -23,22 +26,33 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class LoginFragment extends Fragment {
 
+    private static final String TAG = "LoginFragment";
     private FirebaseAuth auth;
     private TextView emailField;
     private TextView passwordField;
     private Activity context;
+    private TextView tvRegisterLink;
+    private ViewPager2 viewPager2;
 
     public LoginFragment() {
         // Required empty public constructor
     }
+
     public static LoginFragment newInstance(FirebaseUser user) {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
+    public LoginFragment(ViewPager2 viewPager2) {
+        this.viewPager2 = viewPager2;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -71,6 +85,13 @@ public class LoginFragment extends Fragment {
 
         emailField = view.findViewById(R.id.et_email);
         passwordField = view.findViewById(R.id.et_password);
+        tvRegisterLink = view.findViewById(R.id.tv_register_link);
+        tvRegisterLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager2.setCurrentItem(1, true);
+            }
+        });
 
         Button signButton = view.findViewById(R.id.btn_sign_in);
         signButton.setOnClickListener(x -> singIn());

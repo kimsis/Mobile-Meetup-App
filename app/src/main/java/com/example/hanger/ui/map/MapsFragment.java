@@ -1,5 +1,7 @@
 package com.example.hanger.ui.map;
 
+import static com.google.firebase.messaging.Constants.MessageNotificationKeys.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -11,12 +13,14 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,8 @@ import com.example.hanger.MainActivity;
 import com.example.hanger.Notifications;
 import com.example.hanger.R;
 import com.example.hanger.model.HangerUser;
+import com.example.hanger.ui.settings.SharedPreferenceEntry;
+import com.example.hanger.ui.settings.SharedPreferencesHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,6 +65,8 @@ public class MapsFragment extends Fragment implements LocationListener {
     private ArrayList<Marker> allMarkers;
     private  Circle currentCircle;
     private String CHANNEL_ID = "someId";
+    private double distance;
+    private HashMap<String, HangerUser> userMappings;
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -79,6 +87,25 @@ public class MapsFragment extends Fragment implements LocationListener {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferencesHelper sharedPreferencesHelper = new SharedPreferencesHelper(preferences);
+        SharedPreferenceEntry sharedPreferenceEntry = sharedPreferencesHelper.getPersonalInfo();
+        String type = sharedPreferenceEntry.getDistanceType();
+        float amount = sharedPreferenceEntry.getDistanceAmount();
+        switch (type) {
+            case "Km.":
+                distance = amount * 1000;
+                break;
+            case "Mi.":
+                distance = amount * 1609.34;
+                break;
+            case "Ft.":
+                distance = amount * 0.3048;
+            default:
+                distance = amount;
+                break;
+        }
+
         allMarkers = new ArrayList<>();
 
         this.database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -93,7 +120,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
                         List<HangerUser> filteredUsers = FilterRelevantUsers(dataSnapshot);
 
-                        setLocationPins(filteredUsers);
+                        //setLocationPins(filteredUsers);
                     }
 
                     @Override
@@ -107,7 +134,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         GenericTypeIndicator<HashMap<String, HangerUser>> t = new GenericTypeIndicator<HashMap<String, HangerUser>>() {};
 
-        HashMap<String, HangerUser> userMappings = dataSnapshot.getValue(t);
+        userMappings = dataSnapshot.getValue(t);
 
         HangerUser currentUser = userMappings.get(auth.getUid());
 
@@ -120,7 +147,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             double distanceToCurrentUser = getDistance(currentUser.getLatitude(), entry.getValue().getLatitude(), currentUser.getLongitude(), entry.getValue().getLongitude());
 
-            if(distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters())
+            if(distanceToCurrentUser < distance)
                 filtered.add(entry.getValue());
                 showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName());
         }
@@ -204,7 +231,8 @@ public class MapsFragment extends Fragment implements LocationListener {
                 if(currentCircle != null)
                     currentCircle.remove();
 
-                currentCircle = map.addCircle(new CircleOptions().center(current).radius(existingUser.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
+                currentCircle = map.addCircle(new CircleOptions().center(current).radius(distance).strokeColor(Color.BLUE));
+                Log.d(TAG, "onDataChange: " + distance);
 
                 map.animateCamera(CameraUpdateFactory.newLatLng(current));
             }
@@ -243,26 +271,27 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             LatLng location = new LatLng(latitude, longitude);
 
-            if(entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
-            {
-                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
-                toast.show();
-                for (HangerUser user:users) {
-                    if(user.getId().equals(auth.getCurrentUser().getUid()))
-                    {
-                        if(user.getUsersMatched().get(entry.getId()) == "true")
-                        {
-                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
-                            toast1.show();
-                            Marker marker = map.addMarker(new MarkerOptions().position(location));
-
-                            marker.setTitle(entry.getName());
-
-                            allMarkers.add(marker);
-                        }
-                    }
-                }
-            }
+            entry.setUsersMatched(userMappings);
+//            if(entry.getUsersMatched() != null && entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
+//            {
+//                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
+//                toast.show();
+//                for (HangerUser user:users) {
+//                    if(user.getId().equals(auth.getCurrentUser().getUid()))
+//                    {
+//                        if(user.getUsersMatched().get(entry.getId()) == "true")
+//                        {
+//                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
+//                            toast1.show();
+//                            Marker marker = map.addMarker(new MarkerOptions().position(location));
+//
+//                            marker.setTitle(entry.getName());
+//
+//                            allMarkers.add(marker);
+//                        }
+//                    }
+//                }
+//            }
 
         }
     }

@@ -95,32 +95,32 @@ public class HangerUser {
     {
         usersMatched = map;
     }
-
-    public Map<String, String> getUsersMatched()
-    {
-        Map<String, String> hm = new HashMap<String,String>();
-        String[] keys = usersMatched.toString()
-                .replace("{","")
-                .replace("}","")
-                .replace("=","")
-                .replace("false","")
-                .replace("true","").trim().split(",");
-        String[] values = usersMatched.toString()
-                .split(",");
-
-        for (int i = 0; i < keys.length; i++)
-        {
-            if(values[i].contains("false"))
-            {
-                values[i] = "false";
-            }
-            else {
-                values[i] = "true";
-            }
-            hm.put(keys[i].trim(),values[i]);
-        }
-        return hm;
-    }
+//
+//    public Map<String, String> getUsersMatched()
+//    {
+//        Map<String, String> hm = new HashMap<String,String>();
+//        String[] keys = usersMatched.toString()
+//                .replace("{","")
+//                .replace("}","")
+//                .replace("=","")
+//                .replace("false","")
+//                .replace("true","").trim().split(",");
+//        String[] values = usersMatched.toString()
+//                .split(",");
+//
+//        for (int i = 0; i < keys.length; i++)
+//        {
+//            if(values[i].contains("false"))
+//            {
+//                values[i] = "false";
+//            }
+//            else {
+//                values[i] = "true";
+//            }
+//            hm.put(keys[i].trim(),values[i]);
+//        }
+//        return hm;
+//    }
 
 
     private double latitude;

@@ -6,22 +6,16 @@
     app:startDestination="@+id/navigation_map">
 
     <fragment
-        android:id="@+id/navigation_map"
-        android:name="com.example.hanger.ui.map.MapsFragment"
-        android:label="@string/title_map"
-        tools:layout="@layout/fragment_maps" />
-
-    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.hanger.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 
     <fragment
-        android:id="@+id/navigation_secondary_sensor"
-        android:name="com.example.hanger.ui.secondarySensor.SecondarySensorFragment"
-        android:label="@string/title_secondary_sensor"
-        tools:layout="@layout/fragment_secondary_sensor" />
+        android:id="@+id/navigation_map"
+        android:name="com.example.hanger.ui.map.MapsFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_maps" />
 
     <fragment
         android:id="@+id/navigation_requests"
