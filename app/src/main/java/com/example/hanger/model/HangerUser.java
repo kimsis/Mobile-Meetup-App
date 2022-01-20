@@ -99,6 +99,9 @@ public class HangerUser {
     public Map<String, String> getUsersMatched()
     {
         Map<String, String> hm = new HashMap<String,String>();
+        if(usersMatched == null)
+            return hm;
+
         String[] keys = usersMatched.toString()
                 .replace("{","")
                 .replace("}","")

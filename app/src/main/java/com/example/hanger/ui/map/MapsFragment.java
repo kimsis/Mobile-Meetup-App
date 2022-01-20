@@ -188,7 +188,6 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
         notificationManager.notify(1, builder.build());
-
     }
 
     @Override
@@ -201,8 +200,6 @@ public class MapsFragment extends Fragment implements LocationListener {
         }
 
     }
-
-
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
@@ -266,23 +263,32 @@ public class MapsFragment extends Fragment implements LocationListener {
             marker.remove();
         }
 
+        for (HangerUser user:users) {
+            if(user.getId().equals(auth.getCurrentUser().getUid()))
+            {
+                double latitude = user.getLatitude();
+                double longitude = user.getLongitude();
+                LatLng location = new LatLng(latitude, longitude);
+                Marker marker = map.addMarker(new MarkerOptions().position(location));
+                marker.setTitle(user.getName());
+                allMarkers.add(marker);
+            }
+        }
+
         for(HangerUser entry : users) {
             double latitude = entry.getLatitude();
             double longitude = entry.getLongitude();
+
 
             LatLng location = new LatLng(latitude, longitude);
 
             if(entry.getUsersMatched().get(auth.getCurrentUser().getUid()) == "true")
             {
-                Toast toast = Toast.makeText(this.getContext(),"first part true",Toast.LENGTH_SHORT);
-                toast.show();
                 for (HangerUser user:users) {
                     if(user.getId().equals(auth.getCurrentUser().getUid()))
                     {
                         if(user.getUsersMatched().get(entry.getId()) == "true")
                         {
-                            Toast toast1 = Toast.makeText(this.getContext(),"second part true",Toast.LENGTH_SHORT);
-                            toast1.show();
                             Marker marker = map.addMarker(new MarkerOptions().position(location));
 
                             marker.setTitle(entry.getName());
