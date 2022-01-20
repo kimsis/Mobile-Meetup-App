@@ -68,35 +68,12 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         context = getActivity();
-        imageHelper = new ImageHelper(context);
-        ActivityResultLauncher<String> mGetContent = this.registerForActivityResult(new ActivityResultContracts.GetContent(),
-                new ActivityResultCallback<Uri>() {
-                    @Override
-                    public void onActivityResult(Uri uri) {
-                        Bitmap bitmap = null;
-                        try {
-                            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-                            ivProfileImage.setImageBitmap(bitmap);
-                            imageHelper.uploadImage(uri);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
 
         mAuth = FirebaseAuth.getInstance();
         Button registerButton = view.findViewById(R.id.btn_register);
         emailEditText = view.findViewById(R.id.et_email_register);
         passwordEditText = view.findViewById(R.id.et_password_register);
         passwordConfirmEditText = view.findViewById(R.id.et_password_confirm);
-        ivProfileImage = view.findViewById(R.id.iv_profile_picture);
-        ivProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent GaleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                mGetContent.launch("image/*");
-            }
-        });
 
         tvLoginLink = view.findViewById(R.id.tv_login_link);
         tvLoginLink.setOnClickListener(new View.OnClickListener() {
