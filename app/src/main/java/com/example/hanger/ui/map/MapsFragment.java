@@ -154,7 +154,9 @@ public class MapsFragment extends Fragment implements LocationListener {
             {
                 DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/usersNotified");
 
-                if(currentUser.getUsersMatched().get(entry.getValue().getId()).equals("false") && !currentUser.getUsersNotified().contains(entry.getValue().getId()))
+                Log.d(TAG, "FilterRelevantUsers: " + currentUser.getUsersMatched());
+                String matchedUser = currentUser.getUsersMatched().get(entry.getValue().getId());
+                if(matchedUser != null && matchedUser.equals("false") && !currentUser.getUsersNotified().contains(entry.getValue().getId()))
                 {
                     showMatchRequestNotification(entry.getValue().getId(), entry.getValue().getName(), entry.hashCode());
                     currentUser.addToUserNotified(entry.getValue().getId());
@@ -241,7 +243,6 @@ public class MapsFragment extends Fragment implements LocationListener {
                     currentCircle.remove();
 
                 currentCircle = map.addCircle(new CircleOptions().center(current).radius(distance).strokeColor(Color.BLUE));
-                Log.d(TAG, "onDataChange: " + distance);
 
                 map.animateCamera(CameraUpdateFactory.newLatLng(current));
             }

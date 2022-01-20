@@ -32,7 +32,7 @@ public class HangerUser {
     }
 
     public HangerUser() {
-        usersNotified = new ArrayList<>();
+        usersNotified = new ArrayList<String>();
     }
 
     public void setName(String name) {
@@ -45,6 +45,7 @@ public class HangerUser {
 
     public HangerUser(String id) {
         this.id = id;
+        usersNotified = new ArrayList<String>();
     }
 
     public String getId() {
@@ -136,6 +137,8 @@ public class HangerUser {
     private List<String> usersNotified;
 
     public List<String> getUsersNotified() {
+        if(usersNotified == null)
+            return new ArrayList<>();
         return usersNotified;
     }
 
