@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hanger.R;
 import com.example.hanger.databinding.FragmentSettingsBinding;
 import com.example.hanger.ui.helpers.ImageHelper;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.Slider;
 
 import java.io.IOException;
@@ -75,21 +77,23 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         distanceType = type == null || type.isEmpty() || type.equals("") ? "Km." : sharedPreferenceEntry.getDistanceType();
         distance = sharedPreferenceEntry.getDistanceAmount();
         sensorSensitivity = sharedPreferenceEntry.getThemeThreshold();
-        binding.distanceTypeTv.setText(distanceType);
+
+
+        binding.tvDistanceType.setText(distanceType);
         binding.tvDistance.setText(distance + distanceType);
         binding.tvSensorSensitivity.setText(sensorSensitivity + "");
         switch (distanceType) {
             case "M.":
-                binding.activityMainTogglebutton.check(R.id.btn_m);
+                binding.btnGroupDistanceType.check(R.id.btn_m);
                 break;
             case "Km.":
-                binding.activityMainTogglebutton.check(R.id.btn_km);
+                binding.btnGroupDistanceType.check(R.id.btn_km);
                 break;
             case "Ft.":
-                binding.activityMainTogglebutton.check(R.id.btn_ft);
+                binding.btnGroupDistanceType.check(R.id.btn_ft);
                 break;
             case "Mi.":
-                binding.activityMainTogglebutton.check(R.id.btn_mi);
+                binding.btnGroupDistanceType.check(R.id.btn_mi);
                 break;
         }
 
@@ -106,7 +110,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
                 sharedPreferencesHelper.saveThemeThreshold(value);
             }
         });
-        userProfileImage = binding.userProfileImage;
+        userProfileImage = binding.ivUserProfile;
         imageHelper.getImage(userProfileImage);
         binding.sliderDistance.setValue(sharedPreferenceEntry.getDistanceAmount());
         binding.sliderDistance.addOnChangeListener(new Slider.OnChangeListener() {
@@ -133,7 +137,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
                 switch (key) {
                     case SharedPreferencesHelper.KEY_DISTANCE_TYPE:
                         distanceType = prefs.getString(SharedPreferencesHelper.KEY_DISTANCE_TYPE, "");
-                        binding.distanceTypeTv.setText(distanceType);
+                        binding.tvDistanceType.setText(distanceType);
                         binding.tvDistance.setText(distance + distanceType);
                         break;
                     case SharedPreferencesHelper.KEY_DISTANCE_AMOUNT:
@@ -198,6 +202,5 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }

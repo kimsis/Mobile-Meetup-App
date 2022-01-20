@@ -29,7 +29,7 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/userProfileImage"
+                        android:id="@+id/iv_user_profile"
                         android:layout_width="250dp"
                         android:layout_height="250dp"
                         android:contentDescription="profile image"
@@ -170,7 +170,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/distance_type_tv"
+                        android:id="@+id/tv_distance_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
@@ -180,7 +180,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.button.MaterialButtonToggleGroup
-                        android:id="@+id/activity_main_togglebutton"
+                        android:id="@+id/btn_group_distance_type"
                         app:layout_constraintTop_toBottomOf="@+id/distance_type_label_tv"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
