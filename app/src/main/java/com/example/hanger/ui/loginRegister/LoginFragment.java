@@ -28,8 +28,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginFragment extends Fragment {
 
@@ -51,6 +54,7 @@ public class LoginFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public LoginFragment(ViewPager2 viewPager2) {
         this.viewPager2 = viewPager2;
     }
@@ -103,7 +107,7 @@ public class LoginFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        if(auth.getCurrentUser() != null)
+        if (auth.getCurrentUser() != null)
             navigateToMainActivity();
     }
 
@@ -112,38 +116,51 @@ public class LoginFragment extends Fragment {
         startActivity(mainIntent);
     }
 
-    private void singIn(){
+    private void singIn() {
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();
 
-        if(!EmailValidator.isValidEmail(email)) {
+        if (!EmailValidator.isValidEmail(email)) {
             Toast.makeText(context, "Invalid email!", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(password.isEmpty() || password.length() < 6) {
+        if (password.isEmpty() || password.length() < 6) {
             Toast.makeText(context, "Password must be at least 6 symbols!", Toast.LENGTH_SHORT).show();
             return;
         }
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener( context, this::handleSignInResult);
+
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(context, this::handleSignInResult);
 
     }
 
-    private void handleSignInResult(Task<AuthResult> task) {
-        if (task.isSuccessful()) {
+    private void handleSignInResult(Task<AuthResult> loginTask) {
 
-            DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference("locations/" + auth.getUid() );
-            Log.d(TAG, "createAccount: " + ref);
-            HangerUser currentUser = new HangerUser(auth.getUid());
-            currentUser.setLatitude(0);
-            currentUser.setLongitude(0);
-            currentUser.setDiscoveryRadiusMeters(300);
-            ref.setValue(currentUser);
-            Log.d(TAG, "createAccount: " + ref + "       " + currentUser);
-
-            navigateToMainActivity();
-        } else {
+        if (!loginTask.isSuccessful()) {
             Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
+
+        database.getReference("locations/" + auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                HangerUser currentUser = snapshot.getValue(HangerUser.class);
+                if (currentUser == null) {
+                    DatabaseReference ref = database.getReference("locations/" + auth.getUid());
+                    HangerUser userToCreate = new HangerUser();
+                    userToCreate.setId(auth.getUid());
+                    ref.setValue(userToCreate);
+                }
+
+                navigateToMainActivity();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
