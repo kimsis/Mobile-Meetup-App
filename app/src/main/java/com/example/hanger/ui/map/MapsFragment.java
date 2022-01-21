@@ -44,12 +44,12 @@ import java.util.Map;
 
 public class MapsFragment extends Fragment implements LocationListener {
 
-    private static GoogleMap map;
-    private final FirebaseAuth authentication = FirebaseAuth.getInstance();
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
-    private ArrayList<Marker> allMarkers = new ArrayList<>();
-    private Circle currentCircle;
+    private final FirebaseAuth authentication = FirebaseAuth.getInstance();
     private HangerUser currentUser;
+    private ArrayList<Marker> allMarkers = new ArrayList<>();
+    private static GoogleMap map;
+    private Circle currentCircle;
 
     private final LocationListener locationChangeListener = this;
     private final OnMapReadyCallback mapReadyCallback = this::onMapReady;
