@@ -3,11 +3,17 @@ package com.example.hanger.ui.map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -19,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.hanger.MainActivity;
+import com.example.hanger.Notifications;
 import com.example.hanger.R;
 import com.example.hanger.model.HangerUser;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,12 +41,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +83,40 @@ public class MapsFragment extends Fragment implements LocationListener {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         setCurrentUser();
         return view;
+    }
+
+    private void showMatchRequestNotification(String id, String name, int channelId) {
+        Intent intent = new Intent(this.getContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getContext(), 0, intent, 0);
+
+        Intent intentActionAccept = new Intent(this.getContext(), Notifications.class);
+        Intent intentActionDecline = new Intent(this.getContext(), Notifications.class);
+
+        intentActionAccept.putExtra("action", "accept");
+        intentActionAccept.putExtra("userId", id);
+
+        intentActionDecline.putExtra("action", "decline");
+        intentActionDecline.putExtra("userId", id);
+
+        PendingIntent acceptRequest = PendingIntent.getBroadcast(this.getContext(), 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent declineRequest = PendingIntent.getBroadcast(this.getContext(), 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getContext(), "someId")
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle(name + " is in your area!")
+                .setContentText("Wanna see them on the map?")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(R.drawable.common_google_signin_btn_icon_light_normal, "Accept",
+                        acceptRequest)
+                .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",
+                        declineRequest);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
+        notificationManager.notify(channelId, builder.build());
     }
 
     @Override
@@ -157,27 +202,44 @@ public class MapsFragment extends Fragment implements LocationListener {
             return new ArrayList<>();
         }
 
-        HangerUser currentUserLocation = userLocations.get(authentication.getUid());
-        if (currentUserLocation == null) {
-            showErrorToast("Could not find current user in the set of locations.");
-            return new ArrayList<>();
-        }
-
         ArrayList<HangerUser> filtered = new ArrayList<>();
         filtered.add(currentUser);
 
         for (Map.Entry<String, HangerUser> userLocation : userLocations.entrySet()) {
 
-            double distanceToCurrentUser = getDistance(currentUserLocation.getLatitude(), userLocation.getValue().getLatitude(), currentUserLocation.getLongitude(), userLocation.getValue().getLongitude());
-            Boolean matchedWithCurrentUser = userLocation.getValue().getUsersMatched().get(currentUserLocation.getId());
-            boolean isInRadius = distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters() && distanceToCurrentUser < userLocation.getValue().getDiscoveryRadiusMeters();
-            boolean shouldShowOnMap = isInRadius && matchedWithCurrentUser != null && matchedWithCurrentUser;
+            HangerUser otherUser = userLocation.getValue();
+            if (otherUser.getId().equals(currentUser.getId()))
+                continue;
 
-            if (shouldShowOnMap)
-                filtered.add(userLocation.getValue());
+            double distanceToCurrentUser = getDistance(currentUser.getLatitude(), otherUser.getLatitude(), currentUser.getLongitude(), otherUser.getLongitude());
+            boolean bothInRange = distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters() && distanceToCurrentUser < otherUser.getDiscoveryRadiusMeters();
+            if (!bothInRange)
+                continue;
 
-            if (matchedWithCurrentUser != null && !matchedWithCurrentUser) {
-                showErrorToast("Notifications are not yet implemented!");
+            Boolean currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
+            Boolean otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
+            boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch;
+            boolean otherMatched = otherWithCurrentMatch != null && otherWithCurrentMatch;
+
+            if (currentMatched && otherMatched)
+                filtered.add(otherUser);
+
+            if (currentWithOtherMatch != null && !currentWithOtherMatch) {
+                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
+            }
+
+            // * We send a match request to the other user
+            if (currentWithOtherMatch == null) {
+                DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
+                currentUser.getUsersMatched().put(otherUser.getId(), false);
+                currentUserReference.setValue(currentUser);
+            }
+
+            // * Other user sends us a match request
+            if (otherWithCurrentMatch == null) {
+                DatabaseReference otherUserReference = database.getReference("locations/" + otherUser.getId());
+                otherUser.getUsersMatched().put(currentUser.getId(), false);
+                otherUserReference.setValue(otherUser);
             }
         }
 
@@ -201,7 +263,7 @@ public class MapsFragment extends Fragment implements LocationListener {
         }
     }
 
-    private void removeAllMarkers(){
+    private void removeAllMarkers() {
         for (Marker marker : allMarkers) {
             marker.remove();
         }
