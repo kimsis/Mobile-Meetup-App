@@ -209,7 +209,10 @@ public class MapsFragment extends Fragment implements LocationListener {
 
             HangerUser otherUser = userLocation.getValue();
             if (otherUser.getId().equals(currentUser.getId()))
+            {
+                currentUser = otherUser;
                 continue;
+            }
 
             double distanceToCurrentUser = getDistance(currentUser.getLatitude(), otherUser.getLatitude(), currentUser.getLongitude(), otherUser.getLongitude());
             boolean bothInRange = distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters() && distanceToCurrentUser < otherUser.getDiscoveryRadiusMeters();
