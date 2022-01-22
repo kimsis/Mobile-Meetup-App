@@ -12,13 +12,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,20 +30,22 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hanger.MainActivity;
 import com.example.hanger.R;
 import com.example.hanger.databinding.FragmentSettingsBinding;
+import com.example.hanger.model.HangerUser;
 import com.example.hanger.ui.helpers.ImageHelper;
-import com.google.android.gms.auth.api.signin.internal.Storage;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.Slider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 
 public class SettingsFragment extends Fragment implements SensorEventListener {
-
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
+    private final FirebaseAuth authentication = FirebaseAuth.getInstance();
+    private HangerUser currentUser;
     private SettingsViewModel settingsViewModel;
     private FragmentSettingsBinding binding;
     // constant to compare
@@ -67,14 +67,15 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        getCurrentUser();
 
         context = getActivity();
         imageHelper = new ImageHelper(context);
         settingsViewModel =
                 new ViewModelProvider(this).get(SettingsViewModel.class);
-
-        binding = FragmentSettingsBinding.inflate(inflater, container, false);
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -84,7 +85,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         sharedPreferenceEntry = sharedPreferencesHelper.getPersonalInfo();
 
         String type = sharedPreferenceEntry.getDistanceType();
-        distanceType = type == null || type.isEmpty() || type.equals("") ? "Km." : sharedPreferenceEntry.getDistanceType();
+        distanceType = type == null || type.isEmpty() || type.equals("") ? "M." : sharedPreferenceEntry.getDistanceType();
         distance = sharedPreferenceEntry.getDistanceAmount();
         sensorSensitivity = sharedPreferenceEntry.getThemeThreshold();
 
@@ -106,7 +107,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
                 break;
         }
 
-        view.findViewById(R.id.btnLogout).setOnClickListener(new View.OnClickListener() {
+        root.findViewById(R.id.btnLogout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
@@ -115,7 +116,27 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
             }
         });
 
-        return view;
+        return root;
+    }
+
+    private void getCurrentUser() {
+        database.getReference("locations/" + authentication.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HangerUser fetchedUserLocation = dataSnapshot.getValue(HangerUser.class);
+                if (fetchedUserLocation == null) {
+                    showErrorToast("Could not find current user when trying to set location");
+                    return;
+                }
+                currentUser = fetchedUserLocation;
+                binding.etUserName.setText(currentUser.getName());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                showErrorToast("Failed to set user location:" + databaseError.getMessage());
+            }
+        });
     }
 
     @Override
@@ -133,7 +154,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         binding.btnSaveName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseReference ref = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("locations/" + FirebaseAuth.getInstance().getUid() + "/name");
+                DatabaseReference ref = database.getReference().child("locations/" + authentication.getUid() + "/name");
                 ref.setValue(binding.etUserName.getText().toString());
             }
         });
@@ -141,18 +162,19 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         binding.sliderDistance.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                saveDistance(value);
                 sharedPreferencesHelper.saveDistanceAmount(value);
             }
         });
 
         binding.btnM.setOnClickListener(x ->
-                sharedPreferencesHelper.saveDistanceType("M."));
+                saveDistanceType("M."));
         binding.btnKm.setOnClickListener(x ->
-                sharedPreferencesHelper.saveDistanceType("Km."));
+                saveDistanceType("Km."));
         binding.btnFt.setOnClickListener(x ->
-                sharedPreferencesHelper.saveDistanceType("Ft."));
+                saveDistanceType("Ft."));
         binding.btnMi.setOnClickListener(x ->
-                sharedPreferencesHelper.saveDistanceType("Mi."));
+                saveDistanceType("Mi."));
 
         // Saving it from garbage collector
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -203,10 +225,32 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         });
     }
 
+    private void saveDistanceType(String s) {
+        sharedPreferencesHelper.saveDistanceType(s);
+
+        saveDistance(binding.sliderDistance.getValue());
+    }
+
+    private void saveDistance(float value) {
+        DatabaseReference ref = database.getReference().child("locations/" + authentication.getUid() + "/discoveryRadiusMeters");
+        switch (distanceType) {
+            case "Km.":
+                ref.setValue(value * 1000);
+                break;
+            case "Mi.":
+                ref.setValue(value * 1609.34);
+                break;
+            case "Ft.":
+                ref.setValue(value * 0.3048);
+            default:
+                ref.setValue(value);
+                break;
+        }
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(sensorEvent.values[0] < sensorSensitivity) {
+        if (sensorEvent.values[0] < sensorSensitivity) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -226,5 +270,9 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    private void showErrorToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 }
