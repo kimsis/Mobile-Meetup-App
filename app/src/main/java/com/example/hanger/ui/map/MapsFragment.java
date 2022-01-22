@@ -60,6 +60,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     private static GoogleMap map;
     private static boolean hasSubscribed = false;
     private static Circle currentCircle;
+    private static ArrayList<String> usersSeenInRange = new ArrayList<>();
 
     private final LocationListener locationChangeListener = this;
     private final OnMapReadyCallback mapReadyCallback = this::onMapReady;
@@ -239,8 +240,14 @@ public class MapsFragment extends Fragment implements LocationListener {
             DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
             currentUser.getUsersMatched().put(otherUser.getId(), false);
             currentUserReference.setValue(currentUser);
-            showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
+
+            if(!usersSeenInRange.contains(otherUser.getId()))
+            {
+                usersSeenInRange.add(otherUser.getId());
+                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
+            }
         }
+
     }
 
     private void showErrorToast(String message) {
