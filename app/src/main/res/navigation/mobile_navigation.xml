@@ -18,8 +18,9 @@
         tools:layout="@layout/fragment_maps" />
 
     <fragment
-        android:id="@+id/navigation_requests"
-        android:name="com.example.hanger.ui.requests.RequestsFragment"
-        android:label="@string/title_requests"
-        tools:layout="@layout/fragment_requests" />
+        android:id="@+id/navigation_connections"
+        android:name="com.example.hanger.ui.requests.ConnectionsFragment"
+        android:label="Connections"
+        tools:layout="@layout/fragment_connections"/>
+
 </navigation>

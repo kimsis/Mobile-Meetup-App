@@ -5,12 +5,12 @@
     <string name="title_map">Map</string>
     <string name="title_settings">Settings</string>
     <string name="title_secondary_sensor">Secondary Sensor</string>
-    <string name="title_requests">Requests</string>
+    <string name="title_connections">Connections</string>
     <string name="user_description">User Description, or invitation message</string>
     <string name="btn_accept">Accept</string>
     <string name="btn_decline">Decline</string>
     <string name="userImage">User Image</string>
-    <string name="btn_chat">chat</string>
+    <string name="btn_unmatch">Unmatch</string>
     <string name="already_registered">Already registered?</string>
     <string name="upload_picture">Upload Picture</string>
     <string name="confirm_password">Confirm Password</string>
@@ -29,4 +29,6 @@
         <item>Login</item>
         <item>Register</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -17,12 +17,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hanger.R;
-import com.example.hanger.databinding.FragmentRequestsBinding;
 import com.example.hanger.databinding.FragmentSecondarySensorBinding;
 
-public class RequestsFragment extends Fragment {
+public class ConnectionItemFragment extends Fragment {
 
-    private FragmentRequestsBinding binding;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -33,9 +31,8 @@ public class RequestsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         RequestsViewModel requestsViewModel = new ViewModelProvider(this).get(RequestsViewModel.class);
-        binding = FragmentRequestsBinding.inflate(inflater, container, false);
 
-        return binding.getRoot();
+        return getView();
     }
 
     @Override
@@ -47,6 +44,5 @@ public class RequestsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }
