@@ -223,22 +223,14 @@ public class MapsFragment extends Fragment implements LocationListener {
             if (currentMatched && otherMatched)
                 filtered.add(otherUser);
 
-            if (currentWithOtherMatch != null && !currentWithOtherMatch) {
-                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
-            }
-
-            // * We send a match request to the other user
+            // * We put the other user in our matches
             if (currentWithOtherMatch == null) {
                 DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
                 currentUser.getUsersMatched().put(otherUser.getId(), false);
                 currentUserReference.setValue(currentUser);
-            }
 
-            // * Other user sends us a match request
-            if (otherWithCurrentMatch == null) {
-                DatabaseReference otherUserReference = database.getReference("locations/" + otherUser.getId());
-                otherUser.getUsersMatched().put(currentUser.getId(), false);
-                otherUserReference.setValue(otherUser);
+                // * Currently we send notification just once. If you miss it, too bad!
+                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
             }
         }
 
