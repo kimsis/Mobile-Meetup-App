@@ -69,34 +69,14 @@ public class HangerUser {
         this.discoveryRadiusMeters = discoveryRadiusMeters;
     }
 
-    private Map<String, Boolean> usersMatched = new HashMap<>();
+    private Map<String, String> usersMatched = new HashMap<>();
 
-    public Map<String, Boolean> getUsersMatched() {
+    public Map<String, String> getUsersMatched() {
         return usersMatched;
     }
 
-    public void setUsersMatched(Map<String, Boolean> map) {
+    public void setUsersMatched(Map<String, String> map) {
         usersMatched = map;
-    }
-
-    private ArrayList<String> usersLastInRange = new ArrayList<>();
-
-    public ArrayList<String> getUsersLastInRange() {
-        return usersLastInRange;
-    }
-
-    public void setUsersLastInRange(ArrayList<String> map) {
-        usersLastInRange = map;
-    }
-
-    private List<String> usersNotified;
-
-    public List<String> getUsersNotified() {
-        return usersNotified;
-    }
-
-    public void setUsersNotified(List<String> usersNotified) {
-        this.usersNotified = usersNotified;
     }
 }
 

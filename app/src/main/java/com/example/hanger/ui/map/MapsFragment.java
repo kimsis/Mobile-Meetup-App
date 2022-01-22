@@ -227,10 +227,10 @@ public class MapsFragment extends Fragment implements LocationListener {
 
     private void resolveMatchedUsersInRange(ArrayList<HangerUser> visibleUsers, HangerUser otherUser) {
 
-        Boolean currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
-        Boolean otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
-        boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch;
-        boolean otherMatched = otherWithCurrentMatch != null && otherWithCurrentMatch;
+        String currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
+        String otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
+        boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch.equals("Matched");
+        boolean otherMatched = otherWithCurrentMatch != null && otherWithCurrentMatch.equals("Matched");
 
         if (currentMatched && otherMatched)
             visibleUsers.add(otherUser);
@@ -238,16 +238,18 @@ public class MapsFragment extends Fragment implements LocationListener {
         // * First time we see the other user
         if (currentWithOtherMatch == null) {
             DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
-            currentUser.getUsersMatched().put(otherUser.getId(), false);
+            currentUser.getUsersMatched().put(otherUser.getId(), "Unknown");
             currentUserReference.setValue(currentUser);
+            notifyIfNotNotifiedInThisSession(otherUser);
+        } else if (currentWithOtherMatch.equals("Unknown"))
+            notifyIfNotNotifiedInThisSession(otherUser);
+    }
 
-            if(!usersSeenInRange.contains(otherUser.getId()))
-            {
-                usersSeenInRange.add(otherUser.getId());
-                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
-            }
+    private void notifyIfNotNotifiedInThisSession(HangerUser otherUser) {
+        if (!usersSeenInRange.contains(otherUser.getId())) {
+            usersSeenInRange.add(otherUser.getId());
+            showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
         }
-
     }
 
     private void showErrorToast(String message) {

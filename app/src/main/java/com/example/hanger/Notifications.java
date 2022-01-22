@@ -34,14 +34,14 @@ public class Notifications extends BroadcastReceiver {
             allLocations.child(auth.getCurrentUser().getUid())
                     .child("usersMatched")
                     .child(userId)
-                    .setValue(true);
+                    .setValue("Matched");
         }
         if (action.equals("decline")) {
             DatabaseReference allLocations = db.getReference("locations");
             allLocations.child(auth.getCurrentUser().getUid())
                     .child("usersMatched")
                     .child(userId)
-                    .setValue(false);
+                    .setValue("Refused");
         }
         if (context != null) {
             NotificationManagerCompat.from(context).cancel(1);
