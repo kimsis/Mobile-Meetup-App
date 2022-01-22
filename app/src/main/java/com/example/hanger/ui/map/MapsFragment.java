@@ -9,10 +9,8 @@ import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -48,10 +46,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -103,11 +99,10 @@ public class MapsFragment extends Fragment implements LocationListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 currentUser = dataSnapshot.getValue(HangerUser.class);
-                if(!hasSubscribed) {
+                if (!hasSubscribed) {
                     setOnAnyLocationChangeListener();
                     hasSubscribed = true;
-                }
-                else{
+                } else {
                     setInitialPins();
                 }
             }
@@ -193,48 +188,60 @@ public class MapsFragment extends Fragment implements LocationListener {
         HashMap<String, HangerUser> userLocations = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, HangerUser>>() {
         });
 
-        if (userLocations == null) {
+        ArrayList<HangerUser> visibleUsers = new ArrayList<>();
+
+        if (userLocations != null)
+            filterVisibleUsers(userLocations, visibleUsers);
+        else
             showErrorToast("Could not find any user locations.");
-            return new ArrayList<>();
+
+        return visibleUsers;
+    }
+
+    private void filterVisibleUsers(HashMap<String, HangerUser> userLocations, ArrayList<HangerUser> visibleUsers) {
+        visibleUsers.add(currentUser);
+
+        for (Map.Entry<String, HangerUser> userLocation : userLocations.entrySet())
+            filterIfUserShouldBeVisible(visibleUsers, userLocation);
+    }
+
+    private void filterIfUserShouldBeVisible(ArrayList<HangerUser> visibleUsers, Map.Entry<String, HangerUser> userLocation) {
+        HangerUser otherUser = userLocation.getValue();
+
+        if (otherUser.getId().equals(currentUser.getId())) {
+            currentUser = otherUser;
+            return;
         }
 
-        ArrayList<HangerUser> filtered = new ArrayList<>();
-        filtered.add(currentUser);
+        if (!getBothInRangeOfEachOther(otherUser))
+            return;
 
-        for (Map.Entry<String, HangerUser> userLocation : userLocations.entrySet()) {
+        resolveMatchedUsersInRange(visibleUsers, otherUser);
+    }
 
-            HangerUser otherUser = userLocation.getValue();
-            if (otherUser.getId().equals(currentUser.getId()))
-            {
-                currentUser = otherUser;
-                continue;
-            }
+    private boolean getBothInRangeOfEachOther(HangerUser otherUser) {
+        double distanceToCurrentUser = getDistance(currentUser.getLatitude(), otherUser.getLatitude(), currentUser.getLongitude(), otherUser.getLongitude());
+        return distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters() && distanceToCurrentUser < otherUser.getDiscoveryRadiusMeters();
+    }
 
-            double distanceToCurrentUser = getDistance(currentUser.getLatitude(), otherUser.getLatitude(), currentUser.getLongitude(), otherUser.getLongitude());
-            boolean bothInRange = distanceToCurrentUser < currentUser.getDiscoveryRadiusMeters() && distanceToCurrentUser < otherUser.getDiscoveryRadiusMeters();
-            if (!bothInRange)
-                continue;
+    private void resolveMatchedUsersInRange(ArrayList<HangerUser> visibleUsers, HangerUser otherUser) {
+        Boolean currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
+        Boolean otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
+        boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch;
+        boolean otherMatched = otherWithCurrentMatch != null && otherWithCurrentMatch;
 
-            Boolean currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
-            Boolean otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
-            boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch;
-            boolean otherMatched = otherWithCurrentMatch != null && otherWithCurrentMatch;
+        if (currentMatched && otherMatched)
+            visibleUsers.add(otherUser);
 
-            if (currentMatched && otherMatched)
-                filtered.add(otherUser);
+        // * First time we see the other user
+        if (currentWithOtherMatch == null) {
+            DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
+            currentUser.getUsersMatched().put(otherUser.getId(), false);
+            currentUserReference.setValue(currentUser);
 
-            // * We put the other user in our matches
-            if (currentWithOtherMatch == null) {
-                DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
-                currentUser.getUsersMatched().put(otherUser.getId(), false);
-                currentUserReference.setValue(currentUser);
-
-                // * Currently we send notification just once. If you miss it, too bad!
-                showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
-            }
+            // * Currently we send notification just once. If you miss it, too bad!
+            showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
         }
-
-        return filtered;
     }
 
     private void showErrorToast(String message) {
@@ -249,15 +256,14 @@ public class MapsFragment extends Fragment implements LocationListener {
             if (marker != null) {
                 marker.setTitle(userLocation.getName());
                 allMarkers.add(marker);
-
             }
         }
     }
 
     private void removeAllMarkers() {
-        for (Marker marker : allMarkers) {
+        for (Marker marker : allMarkers)
             marker.remove();
-        }
+
         allMarkers = new ArrayList<>();
     }
 
