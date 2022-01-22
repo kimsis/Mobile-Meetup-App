@@ -29,10 +29,12 @@ import com.example.hanger.MainActivity;
 import com.example.hanger.Notifications;
 import com.example.hanger.R;
 import com.example.hanger.model.HangerUser;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -86,40 +88,6 @@ public class MapsFragment extends Fragment implements LocationListener {
         setCurrentUser();
 
         return view;
-    }
-
-    private void showMatchRequestNotification(String id, String name, int channelId) {
-        Intent intent = new Intent(this.getContext(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this.getContext(), 0, intent, 0);
-
-        Intent intentActionAccept = new Intent(this.getContext(), Notifications.class);
-        Intent intentActionDecline = new Intent(this.getContext(), Notifications.class);
-
-        intentActionAccept.putExtra("action", "accept");
-        intentActionAccept.putExtra("userId", id);
-
-        intentActionDecline.putExtra("action", "decline");
-        intentActionDecline.putExtra("userId", id);
-
-        PendingIntent acceptRequest = PendingIntent.getBroadcast(this.getContext(), 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent declineRequest = PendingIntent.getBroadcast(this.getContext(), 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getContext(), "someId")
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle(name + " is in your area!")
-                .setContentText("Wanna see them on the map?")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .addAction(R.drawable.common_google_signin_btn_icon_light_normal, "Accept",
-                        acceptRequest)
-                .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",
-                        declineRequest);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
-        notificationManager.notify(channelId, builder.build());
     }
 
     @Override
@@ -182,6 +150,9 @@ public class MapsFragment extends Fragment implements LocationListener {
         if (currentCircle != null)
             currentCircle.remove();
         currentCircle = map.addCircle(new CircleOptions().center(nextLocation).radius(user.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(nextLocation).zoom(16.0f).build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        map.moveCamera(cameraUpdate);
         map.animateCamera(CameraUpdateFactory.newLatLng(nextLocation));
     }
 
@@ -315,5 +286,39 @@ public class MapsFragment extends Fragment implements LocationListener {
         distance = Math.pow(distance, 2) + Math.pow(height, 2);
 
         return Math.sqrt(distance);
+    }
+
+    private void showMatchRequestNotification(String id, String name, int channelId) {
+        Intent intent = new Intent(this.getContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getContext(), 0, intent, 0);
+
+        Intent intentActionAccept = new Intent(this.getContext(), Notifications.class);
+        Intent intentActionDecline = new Intent(this.getContext(), Notifications.class);
+
+        intentActionAccept.putExtra("action", "accept");
+        intentActionAccept.putExtra("userId", id);
+
+        intentActionDecline.putExtra("action", "decline");
+        intentActionDecline.putExtra("userId", id);
+
+        PendingIntent acceptRequest = PendingIntent.getBroadcast(this.getContext(), 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent declineRequest = PendingIntent.getBroadcast(this.getContext(), 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getContext(), "someId")
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle(name + " is in your area!")
+                .setContentText("Wanna see them on the map?")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(R.drawable.common_google_signin_btn_icon_light_normal, "Accept",
+                        acceptRequest)
+                .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",
+                        declineRequest);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
+        notificationManager.notify(channelId, builder.build());
     }
 }
