@@ -58,9 +58,10 @@ public class MapsFragment extends Fragment implements LocationListener {
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
     private final FirebaseAuth authentication = FirebaseAuth.getInstance();
     private HangerUser currentUser;
-    private ArrayList<Marker> allMarkers = new ArrayList<>();
+    private static ArrayList<Marker> allMarkers = new ArrayList<>();
     private static GoogleMap map;
-    private Circle currentCircle;
+    private static boolean hasSubscribed = false;
+    private static Circle currentCircle;
 
     private final LocationListener locationChangeListener = this;
     private final OnMapReadyCallback mapReadyCallback = this::onMapReady;
@@ -81,7 +82,9 @@ public class MapsFragment extends Fragment implements LocationListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
         setCurrentUser();
+
         return view;
     }
 
@@ -132,7 +135,13 @@ public class MapsFragment extends Fragment implements LocationListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 currentUser = dataSnapshot.getValue(HangerUser.class);
-                setOnAnyLocationChangeListener();
+                if(!hasSubscribed) {
+                    setOnAnyLocationChangeListener();
+                    hasSubscribed = true;
+                }
+                else{
+                    setInitialPins();
+                }
             }
 
             @Override
@@ -178,6 +187,22 @@ public class MapsFragment extends Fragment implements LocationListener {
 
     private void setOnAnyLocationChangeListener() {
         database.getReference("locations").addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<HangerUser> inRadius = getVisibleUsersInRadius(dataSnapshot);
+                        setLocationPins(inRadius);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        showErrorToast(databaseError.getMessage());
+                    }
+                });
+    }
+
+    private void setInitialPins() {
+        database.getReference("locations").addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
