@@ -79,6 +79,16 @@ public class HangerUser {
         usersMatched = map;
     }
 
+    private ArrayList<String> usersLastInRange = new ArrayList<>();
+
+    public ArrayList<String> getUsersLastInRange() {
+        return usersLastInRange;
+    }
+
+    public void setUsersLastInRange(ArrayList<String> map) {
+        usersLastInRange = map;
+    }
+
     private List<String> usersNotified;
 
     public List<String> getUsersNotified() {

@@ -225,6 +225,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     }
 
     private void resolveMatchedUsersInRange(ArrayList<HangerUser> visibleUsers, HangerUser otherUser) {
+
         Boolean currentWithOtherMatch = currentUser.getUsersMatched().get(otherUser.getId());
         Boolean otherWithCurrentMatch = otherUser.getUsersMatched().get(currentUser.getId());
         boolean currentMatched = currentWithOtherMatch != null && currentWithOtherMatch;
@@ -238,8 +239,6 @@ public class MapsFragment extends Fragment implements LocationListener {
             DatabaseReference currentUserReference = database.getReference("locations/" + currentUser.getId());
             currentUser.getUsersMatched().put(otherUser.getId(), false);
             currentUserReference.setValue(currentUser);
-
-            // * Currently we send notification just once. If you miss it, too bad!
             showMatchRequestNotification(otherUser.getId(), otherUser.getName(), otherUser.hashCode());
         }
     }
