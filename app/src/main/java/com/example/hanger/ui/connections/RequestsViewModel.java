@@ -1,4 +1,4 @@
-package com.example.hanger.ui.requests;
+package com.example.hanger.ui.connections;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

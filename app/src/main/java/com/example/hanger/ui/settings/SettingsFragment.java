@@ -150,7 +150,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
             }
         });
         userProfileImage = binding.ivUserProfile;
-        imageHelper.getImage(userProfileImage);
+        imageHelper.getImage(userProfileImage,authentication.getUid());
         binding.btnSaveName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
