@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.hanger.LoginRegisterActivity;
 import com.example.hanger.MainActivity;
 import com.example.hanger.R;
 import com.example.hanger.databinding.FragmentSettingsBinding;
@@ -46,13 +48,11 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
     private final FirebaseAuth authentication = FirebaseAuth.getInstance();
     private HangerUser currentUser;
-    private SettingsViewModel settingsViewModel;
     private FragmentSettingsBinding binding;
     // constant to compare
     // the activity result code
     int SELECT_IMAGE = 200;
     private static final String TAG = "Settings Fragment";
-    ImageView userProfileImage;
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private float sensorSensitivity;
@@ -64,6 +64,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
     private String distanceType;
     private Context context;
     private ImageHelper imageHelper;
+    private boolean firstTrigger = true;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -71,11 +72,25 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         getCurrentUser();
-
         context = getActivity();
         imageHelper = new ImageHelper(context);
-        settingsViewModel =
-                new ViewModelProvider(this).get(SettingsViewModel.class);
+        userImage();
+        binding.btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent logoutIntent = new Intent(context, LoginRegisterActivity.class);
+                startActivity(logoutIntent);
+            }
+        });
+
+        binding.btnSaveName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference ref = database.getReference().child("locations/" + authentication.getUid() + "/name");
+                ref.setValue(binding.etUserName.getText().toString());
+            }
+        });
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -83,42 +98,42 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferencesHelper = new SharedPreferencesHelper(preferences);
         sharedPreferenceEntry = sharedPreferencesHelper.getPersonalInfo();
-
-        String type = sharedPreferenceEntry.getDistanceType();
-        distanceType = type == null || type.isEmpty() || type.equals("") ? "M." : sharedPreferenceEntry.getDistanceType();
-        distance = sharedPreferenceEntry.getDistanceAmount();
-        sensorSensitivity = sharedPreferenceEntry.getThemeThreshold();
-
-        binding.tvDistanceType.setText(distanceType);
-        binding.tvDistance.setText(distance + distanceType);
-        binding.tvSensorSensitivity.setText(sensorSensitivity + "");
-        switch (distanceType) {
-            case "M.":
-                binding.btnGroupDistanceType.check(R.id.btn_m);
-                break;
-            case "Km.":
-                binding.btnGroupDistanceType.check(R.id.btn_km);
-                break;
-            case "Ft.":
-                binding.btnGroupDistanceType.check(R.id.btn_ft);
-                break;
-            case "Mi.":
-                binding.btnGroupDistanceType.check(R.id.btn_mi);
-                break;
-        }
-
-        root.findViewById(R.id.btnLogout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                Intent mainIntent = new Intent(context, MainActivity.class);
-                startActivity(mainIntent);
-            }
-        });
+        setupPreferences();
 
         return root;
     }
 
+    /**
+     * Get user image and add onClick lister for image update
+     */
+    private void userImage(){
+        imageHelper.getImage(binding.ivUserProfile);
+        ActivityResultLauncher<String> mGetContent = this.registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+                            binding.ivUserProfile.setImageBitmap(bitmap);
+                            imageHelper.uploadImage(uri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        binding.ivUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetContent.launch("image/*");
+            }
+        });
+    }
+
+    /**
+     * Get currently logged in user and display his name
+     */
     private void getCurrentUser() {
         database.getReference("locations/" + authentication.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -139,23 +154,37 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         });
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        binding.sliderSensorSensitivity.setValue(sharedPreferenceEntry.getThemeThreshold());
+    /**
+     * Get current sharedPreferences and show them in appropriate fields
+     */
+    private void setupPreferences() {
+        String type = sharedPreferenceEntry.getDistanceType();
+        distanceType = type == null || type.isEmpty() || type.equals("") ? "M." : sharedPreferenceEntry.getDistanceType();
+        distance = sharedPreferenceEntry.getDistanceAmount();
+        sensorSensitivity = sharedPreferenceEntry.getThemeThreshold();
+
+        binding.tvDistanceType.setText(distanceType);
+        binding.tvDistance.setText(distance + " " + distanceType);
+        binding.tvNumberSensorSensitivity.setText(sensorSensitivity + "");
+        switch (distanceType) {
+            case "M.":
+                binding.btnGroupDistanceType.check(R.id.btn_m);
+                break;
+            case "Km.":
+                binding.btnGroupDistanceType.check(R.id.btn_km);
+                break;
+            case "Ft.":
+                binding.btnGroupDistanceType.check(R.id.btn_ft);
+                break;
+            case "Mi.":
+                binding.btnGroupDistanceType.check(R.id.btn_mi);
+                break;
+        }
+        binding.sliderSensorSensitivity.setValue(sensorSensitivity);
         binding.sliderSensorSensitivity.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
                 sharedPreferencesHelper.saveThemeThreshold(value);
-            }
-        });
-        userProfileImage = binding.ivUserProfile;
-        imageHelper.getImage(userProfileImage);
-        binding.btnSaveName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatabaseReference ref = database.getReference().child("locations/" + authentication.getUid() + "/name");
-                ref.setValue(binding.etUserName.getText().toString());
             }
         });
         binding.sliderDistance.setValue(sharedPreferenceEntry.getDistanceAmount());
@@ -201,36 +230,22 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
             }
         };
         preferences.registerOnSharedPreferenceChangeListener(listener);
-
-        ActivityResultLauncher<String> mGetContent = this.registerForActivityResult(new ActivityResultContracts.GetContent(),
-                new ActivityResultCallback<Uri>() {
-                    @Override
-                    public void onActivityResult(Uri uri) {
-                        Bitmap bitmap = null;
-                        try {
-                            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-                            userProfileImage.setImageBitmap(bitmap);
-                            imageHelper.uploadImage(uri);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        userProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mGetContent.launch("image/*");
-            }
-        });
     }
 
-    private void saveDistanceType(String s) {
-        sharedPreferencesHelper.saveDistanceType(s);
+    /**
+     * Save the given distanceType into shared preferences and update distance
+     * @param type
+     */
+    private void saveDistanceType(String type) {
+        sharedPreferencesHelper.saveDistanceType(type);
 
         saveDistance(binding.sliderDistance.getValue());
     }
 
+    /**
+     * Save the given distance into shared preferences
+     * @param value
+     */
     private void saveDistance(float value) {
         DatabaseReference ref = database.getReference().child("locations/" + authentication.getUid() + "/discoveryRadiusMeters");
         switch (distanceType) {
@@ -248,19 +263,31 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
         }
     }
 
+    /**
+     * Get sensor value and update related field and change theme if outside range
+     * @param sensorEvent
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.values[0] < sensorSensitivity) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
+        binding.tvSensorSensitivity.setText(sensorEvent.values[0] + "");
     }
 
+    public void changeTheme() {
+
+    }
+
+    /**
+     * Necessary empty implementation
+     * @param sensor
+     * @param i
+     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
+    /**
+     * Attach light sensor onChange listener
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -268,10 +295,15 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this, lightSensor);
     }
 
+    /**
+     * Show toast with error message
+     * @param message
+     */
     private void showErrorToast(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }

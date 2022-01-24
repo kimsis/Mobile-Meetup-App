@@ -1,13 +1,21 @@
 package com.example.hanger;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.example.hanger.ui.settings.SharedPreferenceEntry;
+import com.example.hanger.ui.settings.SharedPreferencesHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 
@@ -23,14 +31,31 @@ import com.example.hanger.databinding.ActivityMainBinding;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private ActivityMainBinding binding;
+    private float sensorSensitivity;
+    private SensorManager sensorManager;
+    private Sensor lightSensor;
+    private SharedPreferences preferences;
+    private SharedPreferencesHelper sharedPreferencesHelper;
+    private SharedPreferenceEntry sharedPreferenceEntry;
+    private boolean firstTrigger = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferencesHelper = new SharedPreferencesHelper(preferences);
+        sharedPreferenceEntry = sharedPreferencesHelper.getPersonalInfo();
+        sensorSensitivity = sharedPreferenceEntry.getThemeThreshold();
+        sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
         setContentView(R.layout.activity_login_register);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -53,4 +78,40 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /**
+     * Get sensor value and update related field and change theme if outside range
+     * @param sensorEvent
+     */
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        int mode = AppCompatDelegate.getDefaultNightMode();
+        if (sensorEvent.values[0] < sensorSensitivity && mode != AppCompatDelegate.MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else if(mode != AppCompatDelegate.MODE_NIGHT_NO && sensorEvent.values[0] > sensorSensitivity) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /**
+     * Necessary empty implementation
+     * @param sensor
+     * @param i
+     */
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
 }

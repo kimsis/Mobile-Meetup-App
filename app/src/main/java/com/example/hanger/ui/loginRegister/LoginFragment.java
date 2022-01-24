@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.example.hanger.LoginRegisterActivity;
 import com.example.hanger.MainActivity;
 import com.example.hanger.R;
+import com.example.hanger.databinding.FragmentLoginBinding;
+import com.example.hanger.databinding.FragmentSettingsBinding;
 import com.example.hanger.model.HangerUser;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -38,11 +40,9 @@ public class LoginFragment extends Fragment {
 
     private static final String TAG = "LoginFragment";
     private FirebaseAuth auth;
-    private TextView emailField;
-    private TextView passwordField;
     private Activity context;
-    private TextView tvRegisterLink;
     private ViewPager2 viewPager2;
+    private FragmentLoginBinding binding;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -63,13 +63,8 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getActivity();
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -89,18 +84,22 @@ public class LoginFragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
 
-        emailField = view.findViewById(R.id.et_email);
-        passwordField = view.findViewById(R.id.et_password);
-        tvRegisterLink = view.findViewById(R.id.tv_register_link);
-        tvRegisterLink.setOnClickListener(new View.OnClickListener() {
+        binding.tvRegisterLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 viewPager2.setCurrentItem(1, true);
             }
         });
 
-        Button signButton = view.findViewById(R.id.btn_sign_in);
-        signButton.setOnClickListener(x -> singIn());
+        binding.btnSignIn.setOnClickListener(x -> singIn());
+        // Inflate the layout for this fragment
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -117,8 +116,9 @@ public class LoginFragment extends Fragment {
     }
 
     private void singIn() {
-        String email = emailField.getText().toString();
-        String password = passwordField.getText().toString();
+        Log.d(TAG, "singIn: " + binding.etEmail + "    " + binding.etPassword + "    " + "hit");
+        String email = binding.etEmail.getText().toString();
+        String password = binding.etPassword.getText().toString();
 
         if (!EmailValidator.isValidEmail(email)) {
             Toast.makeText(context, "Invalid email!", Toast.LENGTH_SHORT).show();
