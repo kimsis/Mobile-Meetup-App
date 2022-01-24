@@ -142,7 +142,8 @@ public class MapsFragment extends Fragment implements LocationListener {
     private void setCurrentUserLocation(HangerUser user, LatLng nextLocation) {
         user.setLatitude(nextLocation.latitude);
         user.setLongitude(nextLocation.longitude);
-        database.getReference("locations/" + user.getId()).setValue(user);
+        database.getReference("locations/" + user.getId() + "/latitude").setValue(nextLocation.latitude);
+        database.getReference("locations/" + user.getId() + "/longitude").setValue(nextLocation.longitude);
         if (currentCircle != null)
             currentCircle.remove();
         currentCircle = map.addCircle(new CircleOptions().center(nextLocation).radius(user.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
