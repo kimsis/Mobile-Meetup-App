@@ -109,8 +109,8 @@ public class ImageHelper {
         }
     }
 
-    public void getImage(ImageView imageView) {
-        StorageReference ref = storageReference .child("images/" + auth.getUid() + ".jpg");
+    public void getImage(ImageView imageView, String userId) {
+        StorageReference ref = storageReference .child("images/" + userId + ".jpg");
         GlideApp.with(context)
                 .load(ref)
                 .into(imageView);

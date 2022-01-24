@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_connections"
-        android:name="com.example.hanger.ui.requests.ConnectionsFragment"
+        android:name="com.example.hanger.ui.connections.ConnectionsFragment"
         android:label="Connections"
         tools:layout="@layout/fragment_connections"/>
 

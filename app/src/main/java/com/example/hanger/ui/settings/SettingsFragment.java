@@ -107,7 +107,7 @@ public class SettingsFragment extends Fragment implements SensorEventListener {
      * Get user image and add onClick lister for image update
      */
     private void userImage(){
-        imageHelper.getImage(binding.ivUserProfile);
+        imageHelper.getImage(binding.ivUserProfile, authentication.getUid());
         ActivityResultLauncher<String> mGetContent = this.registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
                     @Override
