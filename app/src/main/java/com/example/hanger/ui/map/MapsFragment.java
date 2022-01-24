@@ -315,9 +315,11 @@ public class MapsFragment extends Fragment implements LocationListener {
 
         intentActionAccept.putExtra("action", "accept");
         intentActionAccept.putExtra("userId", id);
+        intentActionAccept.putExtra("channelId", channelId);
 
         intentActionDecline.putExtra("action", "decline");
         intentActionDecline.putExtra("userId", id);
+        intentActionAccept.putExtra("channelId", channelId);
 
         PendingIntent acceptRequest = PendingIntent.getBroadcast(context, 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent declineRequest = PendingIntent.getBroadcast(context, 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -328,7 +330,6 @@ public class MapsFragment extends Fragment implements LocationListener {
                 .setContentText("Wanna see them on the map?")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
                 .addAction(R.drawable.common_google_signin_btn_icon_light_normal, "Accept",
                         acceptRequest)
                 .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",

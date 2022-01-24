@@ -27,6 +27,7 @@ public class Notifications extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getStringExtra("action");
         String userId = intent.getStringExtra("userId");
+        Integer channelId = intent.getIntExtra("channelId",1);
         db = FirebaseDatabase.getInstance("https://hanger-1648c-default-rtdb.europe-west1.firebasedatabase.app/");
         this.auth = FirebaseAuth.getInstance();
         if(action.equals("accept")){
@@ -44,7 +45,7 @@ public class Notifications extends BroadcastReceiver {
                     .setValue("Refused");
         }
         if (context != null) {
-            NotificationManagerCompat.from(context).cancel(1);
+            NotificationManagerCompat.from(context).cancel(channelId);
         }
     }
 }
