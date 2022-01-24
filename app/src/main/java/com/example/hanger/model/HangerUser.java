@@ -29,9 +29,10 @@ public class HangerUser {
         this.id = id;
     }
 
-    private String name = "Anonymous";
+    private String name;
 
     public String getName() {
+        name = name == null || name.isEmpty() || name.equals("") ? "Anonymous": name;
         return name;
     }
 
