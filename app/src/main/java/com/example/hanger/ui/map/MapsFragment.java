@@ -64,6 +64,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
     private final LocationListener locationChangeListener = this;
     private final OnMapReadyCallback mapReadyCallback = this::onMapReady;
+    private Context context;
 
     private void onMapReady(@NonNull GoogleMap googleMap) {
         Activity currentActivity = getActivity();
@@ -82,6 +83,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        context = getContext();
         setCurrentUser();
 
         return view;
@@ -295,13 +297,13 @@ public class MapsFragment extends Fragment implements LocationListener {
     }
 
     private void showMatchRequestNotification(String id, String name, int channelId) {
-        Intent intent = new Intent(this.getContext(), MainActivity.class);
+        Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this.getContext(), 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        Intent intentActionAccept = new Intent(this.getContext(), Notifications.class);
-        Intent intentActionDecline = new Intent(this.getContext(), Notifications.class);
+        Intent intentActionAccept = new Intent(context, Notifications.class);
+        Intent intentActionDecline = new Intent(context, Notifications.class);
 
         intentActionAccept.putExtra("action", "accept");
         intentActionAccept.putExtra("userId", id);
@@ -309,10 +311,10 @@ public class MapsFragment extends Fragment implements LocationListener {
         intentActionDecline.putExtra("action", "decline");
         intentActionDecline.putExtra("userId", id);
 
-        PendingIntent acceptRequest = PendingIntent.getBroadcast(this.getContext(), 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent declineRequest = PendingIntent.getBroadcast(this.getContext(), 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent acceptRequest = PendingIntent.getBroadcast(context, 1, intentActionAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent declineRequest = PendingIntent.getBroadcast(context, 2, intentActionDecline, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getContext(), "someId")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "someId")
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                 .setContentTitle(name + " is in your area!")
                 .setContentText("Wanna see them on the map?")
@@ -324,7 +326,7 @@ public class MapsFragment extends Fragment implements LocationListener {
                 .addAction(R.drawable.common_google_signin_btn_icon_dark_normal, "Decline",
                         declineRequest);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.getContext());
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(channelId, builder.build());
     }
 }
