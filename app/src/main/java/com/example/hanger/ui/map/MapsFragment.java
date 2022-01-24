@@ -59,6 +59,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     private static ArrayList<Marker> allMarkers = new ArrayList<>();
     private static GoogleMap map;
     private static boolean hasSubscribed = false;
+    private boolean initialZoom = true;
     private static Circle currentCircle;
     private static final ArrayList<String> usersSeenInRange = new ArrayList<>();
 
@@ -146,13 +147,18 @@ public class MapsFragment extends Fragment implements LocationListener {
         user.setLongitude(nextLocation.longitude);
         database.getReference("locations/" + user.getId() + "/latitude").setValue(nextLocation.latitude);
         database.getReference("locations/" + user.getId() + "/longitude").setValue(nextLocation.longitude);
+
         if (currentCircle != null)
             currentCircle.remove();
+
         currentCircle = map.addCircle(new CircleOptions().center(nextLocation).radius(user.getDiscoveryRadiusMeters()).strokeColor(Color.BLUE));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(nextLocation).zoom(16.0f).build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        map.moveCamera(cameraUpdate);
-        if (!hasSubscribed)
+
+        if (initialZoom) {
+            initialZoom = false;
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(nextLocation).zoom(16.0f).build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            map.moveCamera(cameraUpdate);
+        } else
             map.animateCamera(CameraUpdateFactory.newLatLng(nextLocation));
     }
 
