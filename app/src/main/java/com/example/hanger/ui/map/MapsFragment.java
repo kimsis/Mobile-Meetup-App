@@ -60,7 +60,7 @@ public class MapsFragment extends Fragment implements LocationListener {
     private static GoogleMap map;
     private static boolean hasSubscribed = false;
     private static Circle currentCircle;
-    private static ArrayList<String> usersSeenInRange = new ArrayList<>();
+    private static final ArrayList<String> usersSeenInRange = new ArrayList<>();
 
     private final LocationListener locationChangeListener = this;
     private final OnMapReadyCallback mapReadyCallback = this::onMapReady;
@@ -152,7 +152,8 @@ public class MapsFragment extends Fragment implements LocationListener {
         CameraPosition cameraPosition = new CameraPosition.Builder().target(nextLocation).zoom(16.0f).build();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
         map.moveCamera(cameraUpdate);
-        map.animateCamera(CameraUpdateFactory.newLatLng(nextLocation));
+        if (!hasSubscribed)
+            map.animateCamera(CameraUpdateFactory.newLatLng(nextLocation));
     }
 
     private void setOnAnyLocationChangeListener() {
