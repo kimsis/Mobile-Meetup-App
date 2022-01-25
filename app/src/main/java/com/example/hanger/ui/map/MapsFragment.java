@@ -103,6 +103,10 @@ public class MapsFragment extends Fragment implements LocationListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 currentUser = dataSnapshot.getValue(HangerUser.class);
+                if(currentUser == null) {
+                    showErrorToast("Failed to get user, please clear app data!");
+                    return;
+                }
                 if (!hasSubscribed) {
                     setOnAnyLocationChangeListener();
                     hasSubscribed = true;
